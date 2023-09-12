@@ -1,0 +1,58 @@
+body {
+        font-family: 'Open Sans', 'Helvetica', sans-serif;
+        font-size: 12pt;
+        min-height: 100%;
+        margin: 0;
+        padding: 8pt 16%;
+}
+
+img#name {
+ 	display: block;
+ 	margin-left: auto;
+	margin-right: auto;
+	width: 50%;
+}
+
+img#photo {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	width: 40%;
+}
+
+div#navbar {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    flex-wrap: wrap;
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: row;
+            flex-direction: row;
+    -webkit-box-flex: 0;
+        -ms-flex-positive: 0;
+            flex-grow: 0;
+    -webkit-box-pack: center;
+        -ms-flex-pack: center;
+            justify-content: center;
+}
+
+div.navbutton {
+	background-color: #e1e1e1;
+        border-radius: 4pt;
+        border-style: none;
+        border-width: 2pt;
+        margin: 0 10pt;
+        padding: 1pt 8pt;
+}
+
+hr {
+        color: #434343;
+        margin-bottom: 12pt;
+        margin-top: 12pt;
+        width: 100%;
+}
+
+p.time {
+	color: silver
+}
