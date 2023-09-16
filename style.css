@@ -1,20 +1,39 @@
-a.navlink {
-	color: #FFFFFF;
-	text-decoration: none;
+body {
+        font-family: 'Open Sans', 'Helvetica', sans-serif;
+        font-size: 15px;
+	margin-left: 250px;
+	margin-right: 250px;
 }
 
-a.blacklink {
+img {
+	display: block;
+ 	margin-left: auto;
+  	margin-right: auto;
+	width: 350px;
+}
+
+img.logo {
+	float: right;
+	width: 100px;
+}
+
+a.navlink {
 	color: #000000;
 	text-decoration: none;
 }
 
-body {
-        font-family: 'Open Sans', 'Helvetica', sans-serif;
-        font-size: 12pt;
+div#navpanel {
+	margin-bottom: 20px;
 }
 
-div#content {
-	padding: 20px 90px;
+div.semester {
+	position: relative;
+	left: 30px;
+}
+
+div.subject {
+	position: relative;
+	left: 30px;
 }
 
 div.description {
@@ -29,57 +48,6 @@ div.edition {
 	margin-bottom: 5px;
 }
 
-div#email {
-	position: relative;
-	float: left;
-}
-
-div#footer {
-	font-size: 10pt;
-	text-align: center;
-	padding: 0px 90px;
-}
-
-div#github {
-	position: relative;
-	float: right;
-}
-
-div#header {
-	padding: 20px 100px;
-}
-
-div#navbar {
-	float: right;
-	position: relative;
-	top: 15px;
-}
-
-div.navbutton {
-	float: left;
-        border-radius: 4pt;
-        border-style: none;
-        border-width: 2pt;
-        margin: 0 10pt;
-        padding: 1pt 8pt;
-}
-
-div.semester {
-	position: relative;
-	left: 30px;
-}
-
-div.subject {
-	position: relative;
-	left: 30px;
-}
-
-div#text {
-	position: relative;
-	left: 70px;
-	width: 1000px;
-}
-
 div.time {
 	position: relative;
 	left: 30px;
@@ -89,24 +57,4 @@ div.time {
 
 h3 {
 	margin-bottom: 10px;
-}
-
-hr {
-        color: #434343;
-        width: 90%;
-}
-
-img.logo {
-	float: right;
-	width: 10%
-}
-
-img#name {
- 	float: left;
-	width: 30%;
-}
-
-img#photo {
-	float: left;
-	width: 31.5%;
 }
