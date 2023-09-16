@@ -1,44 +1,62 @@
+a.navlink {
+	color: #FFFFFF;
+	text-decoration: none;
+}
+
+a.blacklink {
+	color: #000000;
+	text-decoration: none;
+}
+
 body {
         font-family: 'Open Sans', 'Helvetica', sans-serif;
         font-size: 12pt;
-        min-height: 100%;
-        margin: 0;
-        padding: 8pt 16%;
 }
 
-img#name {
- 	display: block;
- 	margin-left: auto;
-	margin-right: auto;
-	width: 50%;
+div#content {
+	padding: 20px 90px;
 }
 
-img#photo {
-	display: block;
-	margin-left: auto;
-	margin-right: auto;
-	width: 40%;
+div.description {
+	position: relative;
+	left: 30px;
+}
+
+div.edition {
+	position: relative;
+	left: 30px;
+	color: #8E00A3;
+	margin-bottom: 5px;
+}
+
+div#email {
+	position: relative;
+	float: left;
+}
+
+div#footer {
+	font-size: 10pt;
+	text-align: center;
+	padding: 0px 90px;
+}
+
+div#github {
+	position: relative;
+	float: right;
+}
+
+div#header {
+	padding: 20px 100px;
 }
 
 div#navbar {
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    flex-wrap: wrap;
-    -webkit-box-orient: horizontal;
-    -webkit-box-direction: normal;
-        -ms-flex-direction: row;
-            flex-direction: row;
-    -webkit-box-flex: 0;
-        -ms-flex-positive: 0;
-            flex-grow: 0;
-    -webkit-box-pack: center;
-        -ms-flex-pack: center;
-            justify-content: center;
+	float: right;
+	position: relative;
+	top: 15px;
 }
 
 div.navbutton {
-	background-color: #e1e1e1;
+	float: left;
         border-radius: 4pt;
         border-style: none;
         border-width: 2pt;
@@ -46,13 +64,49 @@ div.navbutton {
         padding: 1pt 8pt;
 }
 
-hr {
-        color: #434343;
-        margin-bottom: 12pt;
-        margin-top: 12pt;
-        width: 100%;
+div.semester {
+	position: relative;
+	left: 30px;
 }
 
-p.time {
-	color: silver
+div.subject {
+	position: relative;
+	left: 30px;
+}
+
+div#text {
+	position: relative;
+	left: 70px;
+	width: 1000px;
+}
+
+div.time {
+	position: relative;
+	left: 30px;
+	color: #0054A3;
+	margin-bottom: 5px;
+}
+
+h3 {
+	margin-bottom: 10px;
+}
+
+hr {
+        color: #434343;
+        width: 90%;
+}
+
+img.logo {
+	float: right;
+	width: 10%
+}
+
+img#name {
+ 	float: left;
+	width: 30%;
+}
+
+img#photo {
+	float: left;
+	width: 31.5%;
 }
