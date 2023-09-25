@@ -1,7 +1,7 @@
 @media only screen and (max-device-width: 560px) {
 	body {
-       		font-family: 'Open Sans', 'Helvetica', sans-serif;
-        	font-size: 10pt;
+       		font-family: 'Calibri', sans-serif;
+        	font-size: 11pt;
 		margin-left: 10%;
 		margin-right: 10%;
 	}
@@ -12,6 +12,10 @@
 	}
 	a.olylink {
 		color: #000000;
+		text-decoration: none;
+	}
+	a.textlink {
+		color: #B200CC;
 		text-decoration: none;
 	}
 	img {
@@ -42,17 +46,11 @@
 		position: relative;
 		left: 30px;
 	}
-	div.edition {
-		position: relative;
-		left: 30px;
-		color: #8E00A3;
-		margin-bottom: 5px;
-	}
-	div.time {
+	div.edition-time {
 		position: relative;
 		left: 30px;
 		color: #0054A3;
-		margin-bottom: 5px;
+		margin-bottom: 10px;
 	}
 	h3 {
 		margin-bottom: 15px;
@@ -70,12 +68,12 @@
 		color: #000000;
 		text-decoration: none;
 	}
-	a.textlink {
-		color: #B200CC;
-		text-decoration: none;
-	}
 	a.olylink {
 		color: #000000;
+		text-decoration: none;
+	}
+	a.textlink {
+		color: #B200CC;
 		text-decoration: none;
 	}
 	img {
