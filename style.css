@@ -39,11 +39,8 @@
 	}
 	div.caption {
 		margin-top: 10px;
-		margin-left: auto;
-		margin-right: auto;
 		font-size: 30pt;
 		color: #0045CC;
-		width: 55%;
 	}
 	div#navpanel {
 		margin-bottom: 20px;
@@ -114,8 +111,6 @@
 	}
 	div.caption {
 		margin-top: 10px;
-		margin-left: auto;
-		margin-right: auto;
 		font-size: 16px;
 		color: #0045CC;
 	}
