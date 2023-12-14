@@ -1,7 +1,7 @@
 @media only screen and (max-device-width: 560px) {
 	body {
-       		font-family: 'Calibri', sans-serif;
-        	font-size: 15pt;
+       	font-family: 'Calibri', sans-serif;
+        font-size: 15pt;
 		margin-left: 5%;
 		margin-right: 5%;
 	}
@@ -30,8 +30,7 @@
 	}
 	div.caption {
 		margin-top: 10px;
-		font-size: 30pt;
-		color: #0045CC;
+		font-size: 16px;
 	}
 	div#navpanel {
 		margin-bottom: 20px;
@@ -50,12 +49,72 @@
 	h3 {
 		margin-bottom: 10px;
 	}
+	table {
+		text-align: center;
+	}
 }
 
-@media only screen and (min-device-width: 560px) {
+@media only screen and (min-device-width: 560px) and (max-device-width: 1024px){
 	body {
-       		font-family: 'Calibri', sans-serif;
-        	font-size: 17px;
+       	font-family: 'Calibri', sans-serif;
+        font-size: 17px;
+		margin-left: 10%;
+		margin-right: 10%;
+	}
+	a.navlink {
+		color: #000000;
+		text-decoration: none;
+	}
+	a.textlink {
+		color: #B200CC;
+		text-decoration: none;
+	}
+	img {
+		display: block;
+ 		margin-left: auto;
+  		margin-right: auto;
+	}
+	img#name {
+		width: 300px;
+	}
+	img#photo {
+		width: 175px;
+	}
+	img#IOL23 {
+		width: 100%;
+	}
+	div.caption {
+		margin-top: 10px;
+		font-size: 16px;
+	}
+	div#text {
+		margin-left: 6%;
+		margin-right: 6%;
+	}
+	div#navpanel {
+		margin-bottom: 20px;
+	}
+	div.semester {
+		position: relative;
+		left: 30px;
+	}
+	div.subject {
+		position: relative;
+		left: 30px;
+	}
+	h3 {
+		margin-bottom: 10px;
+	}
+	table {
+		width: 300px;
+		text-align: center;
+	}
+}
+
+@media only screen and (min-device-width: 1025px) {
+	body {
+       	font-family: 'Calibri', sans-serif;
+        font-size: 17px;
 		margin-left: 20%;
 		margin-right: 20%;
 	}
