@@ -49,6 +49,7 @@
 		font-family: 'Calibri', sans-serif;
 		font-size: 16px;
 		color: black;
+		padding: 0px;
 	}
 	button:hover {
 		background-color: black;
