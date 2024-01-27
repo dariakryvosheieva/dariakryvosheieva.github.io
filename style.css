@@ -82,7 +82,9 @@
 	div#navpanel {
 		display: flex;
 		justify-content: space-between;
-		margin: 0 22% 25px 22%;
+		width: 400px;
+		margin: auto;
+		margin-bottom: 30px;
 	}
 	div.shown-item {
 		margin-top: -5px;
@@ -135,7 +137,9 @@
 	div#navpanel {
 		display: flex;
 		justify-content: space-between;
-		margin: 0 25% 30px 25%;
+		width: 400px;
+		margin: auto;
+		margin-bottom: 30px;
 	}
 	div.shown-item {
 		margin-top: -5px;
