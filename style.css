@@ -58,7 +58,7 @@
 	}
 }
 
-@media only screen and (min-device-width: 560px) and (max-device-width: 1024px){
+@media only screen and (min-device-width: 560px) and (max-device-width: 1000px){
 	body {
        	font-family: 'Calibri', sans-serif;
         font-size: 17px;
@@ -116,7 +116,7 @@
 	}
 }
 
-@media only screen and (min-device-width: 1025px) {
+@media only screen and (min-device-width: 1001px) {
 	body {
        	font-family: 'Calibri', sans-serif;
         font-size: 17px;
