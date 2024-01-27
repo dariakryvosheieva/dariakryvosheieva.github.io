@@ -2,13 +2,14 @@ function toggleDescription(event) {
     event = event || window.event;
     var source = event.target || event.srcElement;
 
-    if (source.nextElementSibling.className == 'hidden-item') {
-        source.nextElementSibling.className = '';
+    parent = source.parentElement;
+
+    if (parent.nextElementSibling.className == 'hidden-item') {
+        parent.nextElementSibling.className = 'shown-item';
     } else {
-        source.nextElementSibling.className = 'hidden-item';
+        parent.nextElementSibling.className = 'hidden-item';
     }
 
-    var parent = source.parentNode;
     if (parent.className == 'inactive') {
         parent.className = 'active';
     }
@@ -18,7 +19,7 @@ function toggleDescription(event) {
 }
 
 window.onload = function () {
-    for (var elem of document.getElementsByClassName('research-interest')) {
+    for (var elem of document.getElementsByTagName('li')) {
         elem.addEventListener('click', toggleDescription);
     }
 }
