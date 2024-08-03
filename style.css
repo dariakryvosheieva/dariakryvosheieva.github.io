@@ -97,3 +97,9 @@ div.subject {
 	position: relative;
 	left: 30px;
 }
+li {
+	margin-bottom: 3pt;
+}
+ul {
+	margin-bottom: 12pt;
+}
