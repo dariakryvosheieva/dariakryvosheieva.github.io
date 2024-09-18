@@ -84,6 +84,15 @@ a {
 a:hover {
 	color: #ff0062;
 }
+h1 {
+	color: #ffffff;
+}
+h3 {
+	color: #ffffff;
+}
+h4 {
+	color: #ffffff;
+}
 img {
 	display: block;
 	margin-left: auto;
