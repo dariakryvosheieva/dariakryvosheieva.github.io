@@ -4,9 +4,6 @@
 		margin-left: 5%;
 		margin-right: 5%;
 	}
-	div#footer {
-		font-size: 30pt;
-	}
 	div#header {
 		display: flex;
 		justify-content: flex-start;
@@ -16,9 +13,8 @@
 		margin-bottom: 50px;
 		font-size: 30pt;
 	}
-	h1 {
-		font-size: 40pt;
-		margin-bottom: -1px;
+	footer {
+		font-size: 30pt;
 	}
 	img#photo-circle {
 		width: 190px;
@@ -42,10 +38,6 @@
 		margin-top: 50px;
 		margin-bottom: 50px;
 	}
-	h1 {
-		font-size: 20pt;
-		margin-bottom: -1px;
-	}
 	img#photo-circle {
 		width: 110px;
 	}
@@ -54,8 +46,8 @@
 @media only screen and (min-device-width: 1001px) {
 	body {
         font-size: 17px;
-		margin-left: 22%;
-		margin-right: 22%;
+		margin-left: 20%;
+		margin-right: 20%;
 	}
 	div#header {
 		display: flex;
@@ -65,9 +57,11 @@
 		margin-top: 50px;
 		margin-bottom: 50px;
 	}
-	h1 {
-		font-size: 20pt;
-		margin-bottom: -1px;
+	footer {
+		display: flex;
+		justify-content: space-between;
+		margin-top: 50px;
+		margin-bottom: 20px;
 	}
 	img#photo-circle {
 		width: 115px;
@@ -78,31 +72,59 @@ a {
 	color: #7AC2FC;
 	text-decoration: none;
 }
+a.navlink {
+	color: #d0e974;
+}
+a.project-url {
+	text-decoration: underline;
+}
 a:hover {
 	color: #ff0062;
 }
-body {
-	font-family: 'Calibri', sans-serif;
-	color: rgb(195, 195, 195);
-	background-color:rgb(25, 25, 25);
-}
-h1 {
+b {
 	color: #ffffff;
+}
+body {
+	font-family: "Sarabun", sans-serif;
+	font-optical-sizing: auto;
+	font-style: normal;
+	color: rgb(195, 195, 195);
+	background-color:rgb(30, 30, 30);
+}
+code {
+	border: 1px solid rgb(100, 100, 100);
+	border-radius: 3px;
+	font-family: "Inconsolata", "Monaco", Courier, monospace;
+	padding: 1px 5px;
+}
+h2 {
+	color: #ffffff;
+}
+h2.project {
+	margin-top: 0px;
+	margin-bottom: 0px;
 }
 h3 {
 	color: #ffffff;
 }
-h4 {
-	color: #ffffff;
+i {
+	margin-right: 5px;
 }
 img {
 	display: block;
 	margin-left: auto;
 	margin-right: auto;
 }
+img.project-img {
+	margin-top: 20px;
+	width: 600px;
+}
 div#navpanel {
 	margin-top: 30px;
 	margin-bottom: 40px;
+}
+div.project {
+	margin-bottom: 50px;
 }
 div.semester {
 	position: relative;
@@ -124,13 +146,7 @@ li {
 	margin-bottom: 3pt;
 	margin-left: -5pt;
 }
-li.main-page {
-	margin-bottom: 3pt;
-}
 span.coursename {
 	color: white;
 	font-weight: bold;
-}
-ul.main-page {
-	margin-top: -7pt;
 }
