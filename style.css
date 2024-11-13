@@ -22,6 +22,9 @@
 	p {
 		margin-bottom: 30px;
 	}
+	main {
+		min-height: calc(85vh - 4rem);
+	}
 }
 
 @media only screen and (min-device-width: 560px) and (max-device-width: 1000px){
@@ -41,6 +44,9 @@
 	img#photo-circle {
 		width: 110px;
 	}
+	main {
+		min-height: calc(87vh - 4rem);
+	}
 }
 
 @media only screen and (min-device-width: 1001px) {
@@ -57,14 +63,11 @@
 		margin-top: 50px;
 		margin-bottom: 50px;
 	}
-	footer {
-		display: flex;
-		justify-content: space-between;
-		margin-top: 50px;
-		margin-bottom: 20px;
-	}
 	img#photo-circle {
 		width: 115px;
+	}
+	main {
+		min-height: calc(80vh - 4rem);
 	}
 }
 
@@ -72,14 +75,20 @@ a {
 	color: #7AC2FC;
 	text-decoration: none;
 }
+a:hover {
+	color: #ff0062;
+}
 a.navlink {
 	color: #d0e974;
+}
+a.navlink:visited{
+	color:#8e9f50;
 }
 a.project-url {
 	text-decoration: underline;
 }
-a:hover {
-	color: #ff0062;
+a:visited {
+	color:#598cb6;
 }
 b {
 	color: #ffffff;
@@ -91,11 +100,29 @@ body {
 	color: rgb(195, 195, 195);
 	background-color:rgb(30, 30, 30);
 }
+center.caption {
+	font-size: 11pt;
+	font-style: italic;
+	margin-top: 5px;
+}
 code {
 	border: 1px solid rgb(100, 100, 100);
 	border-radius: 3px;
 	font-family: "Inconsolata", "Monaco", Courier, monospace;
 	padding: 1px 5px;
+}
+div#navpanel {
+	margin-top: 30px;
+	margin-bottom: 40px;
+}
+div.project {
+	margin-bottom: 50px;
+}
+footer {
+	display: flex;
+	justify-content: space-between;
+	margin-top: 50px;
+	margin-bottom: 20px;
 }
 h2 {
 	color: #ffffff;
@@ -115,24 +142,9 @@ img {
 	margin-left: auto;
 	margin-right: auto;
 }
-img.project-img {
+img.main-body {
 	margin-top: 20px;
 	width: 600px;
-}
-div#navpanel {
-	margin-top: 30px;
-	margin-bottom: 40px;
-}
-div.project {
-	margin-bottom: 50px;
-}
-div.semester {
-	position: relative;
-	left: 30px;
-}
-div.subject {
-	position: relative;
-	left: 30px;
 }
 li::marker {
 	content: '✦   ';
@@ -146,7 +158,6 @@ li {
 	margin-bottom: 3pt;
 	margin-left: -5pt;
 }
-span.coursename {
-	color: white;
-	font-weight: bold;
+p.publication {
+	margin-top: -15px;
 }
