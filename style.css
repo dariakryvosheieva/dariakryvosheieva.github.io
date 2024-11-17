@@ -90,6 +90,9 @@ a.project-url {
 a:visited {
 	color:#598cb6;
 }
+a:visited:hover {
+	color: #ff0062;
+}
 b {
 	color: #ffffff;
 }
