@@ -1,43 +1,143 @@
 <!DOCTYPE html>
 
 <html>
-	<head>
-		<title>Daria Kryvosheieva | Projects</title>
-		<link rel="favicon" type="image/x-icon" href="favicon.ico">
-		<link rel="stylesheet" href="style.css">
-		<link rel="preconnect" href="https://fonts.googleapis.com">
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-		<link href="https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap" rel="stylesheet">
-		<script src="https://kit.fontawesome.com/e04f20670f.js" crossorigin="anonymous"></script>
-	</head>
-	<body>
-		<div id="navpanel">
-			<a class="navlink" href="index.html">about</a> <b>⋅</b> <a class="navlink" href="publications.html">publications</a> <b>⋅</b> projects
-		</div>
-		<main>
-			<div class="project">
-				<i>August 2024</i>
-				<h2 class="project">Descry: OCR for low-resource writing systems</h2>
-				<a class="project-url" href="https://github.com/dariakryvosheieva/descry-ocr">https://github.com/dariakryvosheieva/descry-ocr</a>
-				<img class="main-body" src="images/app_demo.png">
-				<p>I developed text recognition engines for two new alphabets: <b><a href="https://en.wikipedia.org/wiki/Adlam_script">Adlam</a></b>, used to write the <a href="https://en.wikipedia.org/wiki/Fula_language">Fula</a> language spoken in West Africa, and <b><a href="https://en.wikipedia.org/wiki/Kayah_Li_alphabet">Kayah Li</a></b>, used for dialects of the <a href="https://en.wikipedia.org/wiki/Karenni_language">Kayah</a> continuum in Myanmar.</p>
-				<p>The pipeline for each alphabet consists of a <a href="https://arxiv.org/pdf/1904.01941">CRAFT</a> text detector, which detects bounding boxes of words in an image, and a <a href="https://arxiv.org/pdf/1507.05717">CRNN</a> sequence recognizer, which identifies the word (sequence of characters) in each bounding box. To train the models, I generated a total of 16,250,000 synthetic images by drawing random Unicode strings on different backgrounds with <code>Pillow</code>.</p>
-				<p>Users can interact with the models via a Flask app: you can select an alphabet, upload an image containing text in that alphabet, and have the text recognized.</p>
-			</div>
-			<div class="project">
-				<i>December 2023</i>
-				<h2 class="project">Tone.me: a Mandarin Chinese tone corrector</h2>
-				<a class="project-url" href="https://github.com/tone-me/tone-me">https://github.com/tone-me/tone-me</a>
-				<img class="main-body" src="images/logo.png">
-				<p><b>Tone.me</b> is a web app that helps learners of Mandarin Chinese improve their pronunciation of tones.</p>
-				<p>It uses a <a href="https://huggingface.co/facebook/wav2vec2-base">Wav2Vec2</a> Transformer finetuned for tone classification to identify tones in a speech recording and compare them to the correct tones in the words that the user intended to say. The finetuning dataset consisted of syllables extracted from the <a href="https://www.openslr.org/93/">AISHELL-3 corpus</a> with the help of <code>stable-ts</code>. The app uses the Next.js web framework.</p>
-				<p>Built in collaboration with Riddhi Bhagwat, <a href="https://www.chris-ge.com/">Chris Ge</a>, <a href="https://anshulgupta.com/">Anshul Gupta</a>, and Katherine Guo for the <a href="https://www.ai-at-mit.com/labs">AIM Labs</a> program at MIT.</p>
-			</div>
-		</main>
-		<footer>
-			<a class="navlink" href="https://www.linkedin.com/in/daria-kryvosheieva"><i class="fa-brands fa-linkedin"></i> daria-kryvosheieva</a>
-			<a class="navlink" href="https://scholar.google.com/citations?user=sANdwAkAAAAJ"><i class="fa-brands fa-google-scholar"></i>Daria Kryvosheieva</a>
-			<a class="navlink" href="https://github.com/dariakryvosheieva"><i class="fa-brands fa-github"></i> dariakryvosheieva</a>
-		</footer>
-	</body>
+  <head>
+    <title>Daria Kryvosheieva | Projects</title>
+    <link rel="favicon" type="image/x-icon" href="favicon.ico" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap"
+      rel="stylesheet"
+    />
+    <script
+      src="https://kit.fontawesome.com/e04f20670f.js"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <div id="navpanel">
+      <a class="navlink" href="index.html">about</a> <b>⋅</b>
+      <a class="navlink" href="publications.html">publications</a>
+      <b>⋅</b> projects
+    </div>
+    <main>
+      <div class="project">
+        <i>January 2025</i>
+        <h2 class="project">
+          Diffuse & Deduce: A diffusion-inspired image game
+        </h2>
+        <a
+          class="project-url"
+          href="https://github.com/weblab-class/diffuse-and-deduce"
+          >https://github.com/weblab-class/diffuse-and-deduce</a
+        >
+        <img class="main-body" src="images/diffuse-and-deduce.png" />
+        <p>
+          <b>D&D</b> is a quiz game that aims to help users broaden their
+          knowledge of the world by learning new visual concepts. Inspired by
+          diffusion models, the game leverages noisy images that gradually
+          denoise with time. The player's goal is to guess the image as early as
+          possible.
+        </p>
+        <p>
+          Noise is produced by adding a randomly sampled offset to every color
+          channel of every pixel of the image, with the variance of offsets
+          decreasing over time. The website uses React + Tailwind CSS for the
+          frontend and Node.js for the backend, along with
+          <code>socket.io</code> for real-time interactions between players.
+        </p>
+        <p>
+          Built in collaboration with Saisneha Ghatti and Peter Lin. Selected as
+          a semifinalist at MIT's
+          <a href="https://weblab.mit.edu/">web.lab</a> web programming contest.
+          You can play the game
+          <a href="https://diffuse-and-deduce.onrender.com">here</a>.
+        </p>
+      </div>
+      <div class="project">
+        <i>August 2024</i>
+        <h2 class="project">Descry: OCR for low-resource writing systems</h2>
+        <a
+          class="project-url"
+          href="https://github.com/dariakryvosheieva/descry-ocr"
+          >https://github.com/dariakryvosheieva/descry-ocr</a
+        >
+        <img class="main-body" src="images/app_demo.png" />
+        <p>
+          I developed text recognition engines for two new alphabets:
+          <b><a href="https://en.wikipedia.org/wiki/Adlam_script">Adlam</a></b
+          >, used to write the
+          <a href="https://en.wikipedia.org/wiki/Fula_language">Fula</a>
+          language spoken in West Africa, and
+          <b
+            ><a href="https://en.wikipedia.org/wiki/Kayah_Li_alphabet"
+              >Kayah Li</a
+            ></b
+          >, used for dialects of the
+          <a href="https://en.wikipedia.org/wiki/Karenni_language">Kayah</a>
+          continuum in Myanmar.
+        </p>
+        <p>
+          The pipeline for each alphabet consists of a
+          <a href="https://arxiv.org/pdf/1904.01941">CRAFT</a> text detector,
+          which detects bounding boxes of words in an image, and a
+          <a href="https://arxiv.org/pdf/1507.05717">CRNN</a> sequence
+          recognizer, which identifies the word (sequence of characters) in each
+          bounding box. To train the models, I generated a total of 16,250,000
+          synthetic images by drawing random Unicode strings on different
+          backgrounds with <code>Pillow</code>.
+        </p>
+        <p>
+          Users can interact with the models via a Flask app: you can select an
+          alphabet, upload an image containing text in that alphabet, and have
+          the text recognized.
+        </p>
+      </div>
+      <div class="project">
+        <i>December 2023</i>
+        <h2 class="project">Tone.me: a Mandarin Chinese tone corrector</h2>
+        <a class="project-url" href="https://github.com/tone-me/tone-me"
+          >https://github.com/tone-me/tone-me</a
+        >
+        <img class="main-body" src="images/logo.png" />
+        <p>
+          <b>Tone.me</b> is a web app that helps learners of Mandarin Chinese
+          improve their pronunciation of tones.
+        </p>
+        <p>
+          It uses a
+          <a href="https://huggingface.co/facebook/wav2vec2-base">Wav2Vec2</a>
+          Transformer finetuned for tone classification to identify tones in a
+          speech recording and compare them to the correct tones in the words
+          that the user intended to say. The finetuning dataset consisted of
+          syllables extracted from the
+          <a href="https://www.openslr.org/93/">AISHELL-3 corpus</a> with the
+          help of <code>stable-ts</code>. The app uses the Next.js web
+          framework.
+        </p>
+        <p>
+          Built in collaboration with Riddhi Bhagwat,
+          <a href="https://www.chris-ge.com/">Chris Ge</a>,
+          <a href="https://anshulgupta.com/">Anshul Gupta</a>, and Katherine Guo
+          for the <a href="https://www.ai-at-mit.com/labs">AIM Labs</a> program
+          at MIT.
+        </p>
+      </div>
+    </main>
+    <footer>
+      <a class="navlink" href="https://www.linkedin.com/in/daria-kryvosheieva"
+        ><i class="fa-brands fa-linkedin"></i> daria-kryvosheieva</a
+      >
+      <a
+        class="navlink"
+        href="https://scholar.google.com/citations?user=sANdwAkAAAAJ"
+        ><i class="fa-brands fa-google-scholar"></i>Daria Kryvosheieva</a
+      >
+      <a class="navlink" href="https://github.com/dariakryvosheieva"
+        ><i class="fa-brands fa-github"></i> dariakryvosheieva</a
+      >
+    </footer>
+  </body>
 </html>
