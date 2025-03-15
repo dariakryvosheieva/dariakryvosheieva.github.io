@@ -13,6 +13,10 @@
     margin-bottom: 50px;
     font-size: 30pt;
   }
+  div.project-header-container {
+    height: 52px;
+    font-size: 30pt;
+  }
   footer {
     font-size: 30pt;
   }
@@ -22,6 +26,10 @@
   img.main-body {
     width: 100%;
   }
+  hr {
+    width: 40%;
+    margin-bottom: 20px;
+  }
   p {
     margin-bottom: 30px;
   }
@@ -30,7 +38,7 @@
   }
 }
 
-@media only screen and (min-device-width: 560px) and (max-device-width: 1000px) {
+@media only screen and (min-device-width: 560px) and (max-device-width: 1200px) {
   body {
     font-size: 17px;
     margin-left: 10%;
@@ -44,6 +52,9 @@
     margin-top: 50px;
     margin-bottom: 50px;
   }
+  div.project-header-container {
+    height: 21px;
+  }
   img#photo-circle {
     width: 110px;
   }
@@ -55,7 +66,7 @@
   }
 }
 
-@media only screen and (min-device-width: 1001px) {
+@media only screen and (min-device-width: 1201px) {
   body {
     font-size: 17px;
     margin-left: 20%;
@@ -68,6 +79,9 @@
     gap: 20px;
     margin-top: 50px;
     margin-bottom: 50px;
+  }
+  div.project-header-container {
+    height: 21px;
   }
   img#photo-circle {
     width: 115px;
@@ -130,9 +144,11 @@ div#navpanel {
 div.project {
   margin-bottom: 50px;
 }
+div.project-header-container {
+  display: inline-block;
+  width: 100%;
+}
 footer {
-  display: flex;
-  justify-content: space-between;
   margin-top: 50px;
   margin-bottom: 20px;
 }
@@ -156,6 +172,9 @@ img {
 }
 img.main-body {
   margin-top: 20px;
+}
+img.pictogram {
+  height: 100%;
 }
 li::marker {
   content: "✦   ";
