@@ -102,16 +102,16 @@ a:hover {
   color: #ff0062;
 }
 a.navlink {
-  color: #d0e974;
+  color: #d0e974e8;
 }
 a.navlink:visited {
-  color: #8e9f50;
+  color: #9db250;
 }
 a.project-url {
   text-decoration: underline;
 }
 a:visited {
-  color: #598cb6;
+  color: #5796ca;
 }
 a:visited:hover {
   color: #ff0062;
