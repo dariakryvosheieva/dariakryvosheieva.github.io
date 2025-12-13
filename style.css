@@ -176,11 +176,11 @@ img.main-body {
 img.pictogram {
   height: 100%;
 }
-li::marker {
+ul > li::marker {
   content: "✦   ";
   font-size: 10pt;
 }
-li.inside::marker {
+ul > li.inside::marker {
   content: "✧   ";
   font-size: 10pt;
 }

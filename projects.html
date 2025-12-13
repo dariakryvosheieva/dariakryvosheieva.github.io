@@ -25,6 +25,41 @@
     <main>
       <div class="project">
         <div class="project-header-container">
+          <i style="float: left">December 2025</i>
+          <img
+            class="pictogram"
+            src="images/pictograms/sora.png"
+            style="float: right"
+          />
+        </div>
+        <h2 class="project">Prompt Enhancer LLM for Video Generation</h2>
+        <a
+          class="project-url"
+          href="https://github.com/dariakryvosheieva/video-prompt-enhancer"
+          >https://github.com/dariakryvosheieva/video-prompt-enhancer</a
+        >
+        <img class="main-body" src="images/prompt-enhancer.png" />
+        <p>
+          I fine-tuned an LLM to translate simple video generation prompts into detailed,
+          professional-grade prompts for improved video quality.
+        </p>
+        <p>
+          The model was initialized from <a
+            href="https://huggingface.co/Qwen/Qwen2.5-14B-Instruct"
+            >Qwen2.5-14B-Instruct</a
+          > and trained with LoRA in two stages:
+          <ol>
+            <li>Next-token prediction on synthetic pairs of simple and
+          corresponding detailed prompts;</li>
+              <li>Online RL: the model receives a simple prompt, generates a detailed prompt, and is updated via PPO based on the <a href="https://github.com/zai-org/VisionReward/tree/main">VisionReward</a> score of the resulting Sora video.</li>
+          </ol>
+        </p>
+        <p>
+          Final project for MIT <a href="https://web.mit.edu/6.7920/www/">6.7920</a>: Reinforcement Learning. You can find the model on <a href="https://huggingface.co/dariakryvosheieva/video-prompt-enhancer">HuggingFace</a> and view videos made with it on <a href="https://sora.chatgpt.com/profile/daria-k">Sora</a>.
+        </p>
+      </div>
+      <div class="project">
+        <div class="project-header-container">
           <i style="float: left">January 2025</i>
           <img
             class="pictogram"
