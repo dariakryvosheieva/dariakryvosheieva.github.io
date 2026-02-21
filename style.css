@@ -94,6 +94,12 @@
   }
 }
 
+img#photo-circle {
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
 a {
   color: #7ac2fc;
   text-decoration: none;
