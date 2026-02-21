@@ -11,17 +11,17 @@
     gap: 20px;
     margin-top: 50px;
     margin-bottom: 50px;
-    font-size: 30pt;
+    font-size: 1em;
   }
   div.project-header-container {
     height: 52px;
-    font-size: 30pt;
+    font-size: 1em;
   }
   footer {
-    font-size: 30pt;
+    font-size: 1em;
   }
   img#photo-circle {
-    width: 190px;
+    width: 125px;
   }
   img.main-body {
     width: 100%;
