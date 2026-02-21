@@ -14,8 +14,11 @@
     font-size: 1em;
   }
   div.project-header-container {
-    height: 52px;
+    height: 1.25em;
     font-size: 1em;
+  }
+  div.project-header-container img.pictogram {
+    height: 1.25em;
   }
   footer {
     font-size: 1em;
