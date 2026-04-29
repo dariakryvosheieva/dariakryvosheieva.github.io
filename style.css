@@ -107,20 +107,14 @@ a {
   color: #7ac2fc;
   text-decoration: none;
 }
+a.navlink {
+  color: #d7e670;
+}
 a:hover {
   color: #ff0062;
 }
-a.navlink {
-  color: #d0e974e8;
-}
-a.navlink:visited {
-  color: #9db250;
-}
 a.project-url {
   text-decoration: underline;
-}
-a:visited {
-  color: #5796ca;
 }
 a:visited:hover {
   color: #ff0062;
