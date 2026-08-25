@@ -14,11 +14,10 @@
     font-size: 1em;
   }
   div.project-header-container {
-    height: 1.25em;
     font-size: 1em;
   }
   div.project-header-container img.pictogram {
-    height: 1.25em;
+    height: 1.75em;
   }
   footer {
     font-size: 1em;
@@ -55,9 +54,6 @@
     margin-top: 50px;
     margin-bottom: 50px;
   }
-  div.project-header-container {
-    height: 21px;
-  }
   img#photo-circle {
     width: 110px;
   }
@@ -82,9 +78,6 @@
     gap: 20px;
     margin-top: 50px;
     margin-bottom: 50px;
-  }
-  div.project-header-container {
-    height: 21px;
   }
   img#photo-circle {
     width: 115px;
@@ -148,7 +141,9 @@ div.project {
   margin-bottom: 50px;
 }
 div.project-header-container {
-  display: inline-block;
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
   width: 100%;
 }
 footer {
@@ -177,7 +172,8 @@ img.main-body {
   margin-top: 20px;
 }
 img.pictogram {
-  height: 100%;
+  height: 30px;
+  margin: 0;
 }
 ul > li::marker {
   content: "✦   ";

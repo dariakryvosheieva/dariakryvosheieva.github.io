@@ -26,11 +26,42 @@
     <main>
       <div class="project">
         <div class="project-header-container">
-          <i style="float: left">December 2025</i>
+          <i>August 2026</i>
+          <img
+            class="pictogram"
+            src="images/pictograms/lo-solver.svg"
+            alt=""
+          />
+        </div>
+        <h2 class="project">Symbolic solver for linguistics olympiad problems</h2>
+        <a
+          class="project-url"
+          href="https://github.com/dariakryvosheieva/lo-solver"
+          >https://github.com/dariakryvosheieva/lo-solver</a
+        >
+        <img class="main-body" src="images/lo-solver.png" />
+        <p>
+          <b>LO Solver</b> is a system that solves linguistics olympiad problems using techniques from symbolic program synthesis.
+        </p>
+        <p>
+          The problem-solving process is modeled as a <b>heuristic search</b> over the space of all candidate solutions:
+          <ul>
+            <li>word-level correspondences are found via SAT-based synthesis (<a href="https://people.csail.mit.edu/asolar/papers/thesis.pdf">sketching</a>);</li>
+            <li>morpheme-level correspondences are then found via branch-and-bound search with an edit distance objective;</li>
+            <li>phonological rule discovery is guided by observed sound changes and rule fitness (improvement in the edit distance objective after applying the rule).</li>
+          </ul>
+        </p>
+        <p>
+          This work extends my final project for MIT <a href="https://people.csail.mit.edu/asolar/SynthesisCourse/index.htm">6.5130</a> (Program Synthesis), and builds upon a prior <a href="https://www.nature.com/articles/s41467-022-32012-w">paper</a> applying synthesis to phonology-focused problems.
+        </p>
+      </div>
+      <div class="project">
+        <div class="project-header-container">
+          <i>December 2025</i>
           <img
             class="pictogram"
             src="images/pictograms/sora.png"
-            style="float: right"
+            alt=""
           />
         </div>
         <h2 class="project">Prompt enhancer LLM for video generation</h2>
@@ -61,11 +92,11 @@
       </div>
       <div class="project">
         <div class="project-header-container">
-          <i style="float: left">January 2025</i>
+          <i>January 2025</i>
           <img
             class="pictogram"
-            src="images/pictograms/diffuse-and-deduce.png"
-            style="float: right"
+            src="images/pictograms/diffuse-and-deduce.svg"
+            alt=""
           />
         </div>
         <h2 class="project">
@@ -101,11 +132,11 @@
       </div>
       <div class="project">
         <div class="project-header-container">
-          <i style="float: left">August 2024</i>
+          <i>August 2024</i>
           <img
             class="pictogram"
-            src="images/pictograms/descry.png"
-            style="float: right"
+            src="images/pictograms/descry.svg"
+            alt=""
           />
         </div>
         <h2 class="project">Descry: OCR for low-resource writing systems</h2>
@@ -147,11 +178,11 @@
       </div>
       <div class="project">
         <div class="project-header-container">
-          <i style="float: left">December 2023</i>
+          <i>December 2023</i>
           <img
             class="pictogram"
-            src="images/pictograms/tone-me.png"
-            style="float: right"
+            src="images/pictograms/tone-me.svg"
+            alt=""
           />
         </div>
         <h2 class="project">Tone.me: A Mandarin Chinese tone corrector</h2>
