@@ -103,16 +103,22 @@ a {
 a.navlink {
   color: #d7e670;
 }
-a:hover {
-  color: #ff0062;
+a.footnote {
+  color: rgb(195, 195, 195);
 }
 a.project-url {
   text-decoration: underline;
 }
-a:visited:hover {
+a:hover {
   color: #ff0062;
 }
-b {
+a.footnote:hover {
+  color: rgb(195, 195, 195);
+}
+
+b,
+th,
+mjx-container {
   color: #ffffff;
 }
 body {
@@ -156,6 +162,9 @@ h2 {
 h2.project {
   margin-top: 0px;
   margin-bottom: 0px;
+}
+h2.blogpost {
+  margin-bottom: 5px;
 }
 h3 {
   color: #ffffff;

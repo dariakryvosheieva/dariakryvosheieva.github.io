@@ -1,0 +1,328 @@
+<!doctype html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Daria Kryvosheieva | Blog</title>
+    <link rel="favicon" type="image/x-icon" href="favicon.ico" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap"
+      rel="stylesheet"
+    />
+    <script
+      src="https://kit.fontawesome.com/e04f20670f.js"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      id="MathJax-script"
+      async
+      src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"
+    ></script>
+  </head>
+  <body>
+    <div id="navpanel">
+      <a class="navlink" href="index.html">about</a> <b>⋅</b>
+      <a class="navlink" href="publications.html">publications</a>
+      <b>⋅</b> <a class="navlink" href="projects.html">projects</a>
+    </div>
+    <main>
+      <h2 class="blogpost">
+        Installing a Refusal Circuit into a Language Model
+      </h2>
+      <i>2 Nov 2026</i>
+      <p>
+        Twelve days ago, I attended Prof.
+        <a href="https://zicokolter.com/">Zico Kolter</a>'s talk on inverse
+        mechanistic interpretability at MIT. After the talk, I became very
+        excited about his proposed idea of "compiling" deterministic programs
+        into neural network weights, and decided to try it out.
+      </p>
+      <p>
+        I believe the idea has safety implications: e.g., one can install a
+        refusal circuit into an LLM, so that harmful queries are
+        deterministically refused through the circuit, while benign queries are
+        processed through the rest of the model.
+      </p>
+      <p>
+        In this experiment, I rewrote a set of weights in a Qwen model to
+        predict the exact sequence
+        <code>I'm sorry, I cannot assist with this request.</code> A pair of MLP
+        neurons in the same model is trained to serve as a harmfulness detector:
+        if the detector fires, the input is routed through the circuit and the
+        model generates the refusal sequence; otherwise, the input is routed
+        through the remainder of the model and generations remain (essentially)
+        intact.
+      </p>
+      <p>
+        With the installed circuit, the base model
+        <code>Qwen2.5-1.5B</code> nearly matches the refusal rates of the
+        safety-trained <code>Qwen2.5-1.5B-Instruct</code>, at a perplexity cost
+        of only 0.4% relative to the base model without the circuit. Even more
+        importantly, this approach to refusal is interpretable by construction:
+        if the model under- or over-refused, we can see precisely what went
+        wrong.
+      </p>
+      <p>
+        Code for this experiment is available at
+        <a href="github.com/dariakryvosheieva/refusal-circuit"
+          >github.com/dariakryvosheieva/refusal-circuit</a
+        >.
+      </p>
+      <h3>Circuit Walkthrough</h3>
+      <p>
+        The circuit starts at layer 18 of the 28-layer
+        <code>Qwen2.5-1.5B</code> model. Two <b>detector neurons</b>, #8958 and
+        #8959 in the layer 18 MLP, are trained to fire if and only if the
+        current token is the last token of a harmful prompt. If the neurons
+        fire, they write to residual dimension 868 (henceforth the
+        <b>trigger dimension</b>); if they don't fire, their output to that
+        dimension stays zero.
+      </p>
+      <p>
+        In the next layer 19, attention head 3 (the
+        <b>latch head</b>) reads from the trigger dimension: if it reads a
+        nonzero value at some token position, it writes to residual dimension
+        793 (the <b>latch dimension</b>) at that and every subsequent position.
+      </p>
+      <p>
+        The latch head's output propagates through layers 20-26, until it
+        reaches the 11 <b>output neurons</b> in layer 27 MLP. Each output neuron
+        \(k\) fires if the current token position is output token \(k - 1\)
+        after a harmful prompt (i.e., if the model needs to predict refusal
+        token \(k\)). Upon firing, the neuron pushes the residual stream in
+        refusal token \(k\)'s unembedding direction.
+      </p>
+      <figure id="refusal-circuit-viz">
+        <noscript>
+          <i>The interactive walkthrough needs JavaScript.</i>
+        </noscript>
+      </figure>
+      <script src="refusal-circuit-viz.js"></script>
+      <h3>Training</h3>
+      <p>
+        All trainable vectors — detector \(w\), detector \(v\), and output
+        \(w^{(k)}\) — are trained on mixed datasets of positive and negative
+        examples. The <code>gate_proj</code> vectors (detector \(w\) and output
+        \(w^{(k)}\)) are trained with a binary cross-entropy objective to keep
+        the positives and negatives far apart on different sides of 0. The
+        <code>up_proj</code> vector \(v\) is trained with a ridge regression
+        objective to have a dot product of exactly 1 with positive inputs and 0
+        with negative ones.
+      </p>
+      <p>
+        For <b>detector \(w\)</b>, positives are inputs at which we want the
+        detector to fire, namely representations of marker tokens in harmful
+        prompts. Negatives are inputs at which we want the detector to stay
+        silent: marker tokens in harmless prompts and non-marker tokens across
+        prompts, responses, and non-conversational texts.
+      </p>
+      <p>
+        <b>Detector \(v\)</b> is instead trained to be selective for the
+        marker's identity: positives are markers from both harmful and harmless
+        prompts, while negatives are non-markers from prompts, responses, and
+        non-conversational texts.
+      </p>
+      <p>
+        <b>Output \(w^{(k)}\)</b> is trained to select for refusal token \(k -
+        1\): its positives are representations of that token (within refusing
+        responses to harmful prompts), while its negatives are representations
+        of other refusal tokens and the final period after a complete refusal
+        phrase.
+      </p>
+      <p>
+        Harmful prompts are taken from
+        <a href="https://huggingface.co/datasets/walledai/AdvBench">AdvBench</a>
+        and
+        <a href="https://huggingface.co/datasets/bench-llm/or-bench"
+          >OR-bench</a
+        >
+        <i>toxic;</i>harmless prompts from
+        <a href="https://huggingface.co/datasets/tatsu-lab/alpaca">Alpaca</a>
+        and
+        <a href="https://huggingface.co/datasets/bench-llm/or-bench"
+          >OR-bench</a
+        >
+        <i>safe;</i>harmless responses from
+        <a href="https://huggingface.co/datasets/tatsu-lab/alpaca">Alpaca</a>;
+        harmless non-conversational texts from
+        <a href="https://huggingface.co/datasets/mindchain/wikitext2"
+          >WikiText-2</a
+        >
+        (train split).
+      </p>
+      <p>
+        In total, there are 975 harmful and 3,320 harmless prompts, each
+        contributing one marker representation, plus about 260k non-marker
+        representations (100k from the prompts themselves, 5k from additional
+        Alpaca instructions, 115k from Alpaca responses, 40k from
+        non-conversational text). The eleven output vectors are trained on 80 of
+        the 975 harmful and 80 of the 3,320 harmless prompts, each extended with
+        every prefix of the refusal phrase, for 1,410 training points in total.
+      </p>
+      <h3>Results</h3>
+      <p>
+        After installing the circuit, I evaluated the model's refusal scores on
+        six out-of-distribution benchmarks: three testing refusal of harmful
+        prompts (<a href="https://huggingface.co/datasets/Paul/XSTest"
+          >XSTest</a
+        >
+        <i>unsafe,</i
+        ><a href="https://huggingface.co/datasets/JailbreakBench/JBB-Behaviors"
+          >JBB</a
+        >
+        <i>harmful,</i
+        ><a href="https://huggingface.co/datasets/walledai/HarmBench"
+          >HarmBench</a
+        >
+        <i>standard;</i>higher is better) and three testing non-refusal of
+        harmless prompts (XSTest <i>safe,</i>JBB <i>benign,</i>OR-Bench
+        <i>hard;</i>lower is better). All scores were compared to the base model
+        <code>Qwen2.5-1.5B</code> without the circuit and to the safety-trained
+        Instruct model <code>Qwen2.5-1.5B-Instruct</code>.
+      </p>
+      <p>
+        The base model does not refuse harmful requests at all (12.0-18.5%), but
+        installing the circuit brings its refusal rates close to the level of
+        the Instruct model (76.0-88.8% against 92.5-98.9%), despite the circuit
+        being much more parameter-efficient and data-efficient than conventional
+        safety post-training. The model with the circuit also over-refuses less
+        than the Instruct model (e.g., 17.9% vs. 82.1% on OR-Bench <i>hard).</i>
+      </p>
+      <style>
+        .results-table {
+          border-collapse: collapse;
+        }
+
+        .results-table th,
+        .results-table td {
+          padding: 6px 24px;
+          text-align: left;
+          white-space: nowrap;
+        }
+
+        .results-table thead {
+          border-bottom: 1px solid currentColor;
+        }
+
+        .results-table tbody + tbody {
+          border-top: 1px solid currentColor;
+        }
+      </style>
+
+      <div style="overflow-x: auto">
+        <table class="results-table">
+          <thead>
+            <tr>
+              <th>Dataset</th>
+              <th>Base model</th>
+              <th>Base model w/circuit</th>
+              <th>Instruct model</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>XSTest <i>unsafe</i></td>
+              <td>18.5%</td>
+              <td>76.0%</td>
+              <td>97.0%</td>
+            </tr>
+            <tr>
+              <td>JBB <i>harmful</i></td>
+              <td>12.4%</td>
+              <td>88.8%</td>
+              <td>98.9%</td>
+            </tr>
+            <tr>
+              <td>HarmBench <i>standard</i></td>
+              <td>12.0%</td>
+              <td>84.5%</td>
+              <td>92.5%</td>
+            </tr>
+          </tbody>
+          <tbody>
+            <tr>
+              <td>XSTest <i>safe</i></td>
+              <td>2.4%</td>
+              <td>22.4%</td>
+              <td>48.4%</td>
+            </tr>
+            <tr>
+              <td>JBB <i>benign</i></td>
+              <td>1.0%</td>
+              <td>38.0%</td>
+              <td>47.0%</td>
+            </tr>
+            <tr>
+              <td>OR-Bench <i>hard</i></td>
+              <td>3.5%</td>
+              <td>17.9%</td>
+              <td>82.1%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        As a measure of collateral damage, I evaluated how the circuit affects
+        perplexity on WikiText-2 (test split). The model with the circuit has
+        perplexity 18.94 against the unmodified model's 18.87, meaning that the
+        circuit costs only 0.40% relative perplexity increase.
+      </p>
+      <div style="overflow-x: auto">
+        <table class="results-table">
+          <thead>
+            <tr>
+              <th>Metric</th>
+              <th>Base model</th>
+              <th>Base model w/circuit</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>NLL</td>
+              <td>2.9373</td>
+              <td>2.9413</td>
+            </tr>
+            <tr>
+              <td>Perplexity</td>
+              <td>18.87</td>
+              <td>18.94</td>
+            </tr>
+            <tr>
+              <td>Next-token accuracy</td>
+              <td>45.48%</td>
+              <td>45.39%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <!-- <h3>Discussion</h3>
+      <p>TODO</p> -->
+    </main>
+    <footer>
+      <a class="navlink" href="https://www.linkedin.com/in/daria-kryvosheieva"
+        ><i class="fa-brands fa-linkedin fa-lg"></i
+      ></a>
+      <b>⋅</b>
+      <a class="navlink" href="https://x.com/DKryvosheieva"
+        ><i class="fa-brands fa-twitter fa-lg" style="margin-left: 5px"></i
+      ></a>
+      <b>⋅</b>
+      <a
+        class="navlink"
+        href="https://scholar.google.com/citations?user=sANdwAkAAAAJ"
+        ><i
+          class="fa-brands fa-google-scholar fa-lg"
+          style="margin-left: 5px"
+        ></i
+      ></a>
+      <b>⋅</b>
+      <a class="navlink" href="https://github.com/dariakryvosheieva"
+        ><i class="fa-brands fa-github fa-lg" style="margin-left: 5px"></i
+      ></a>
+    </footer>
+  </body>
+</html>
