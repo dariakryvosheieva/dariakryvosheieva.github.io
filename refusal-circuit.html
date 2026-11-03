@@ -187,9 +187,9 @@
             The trigger and latch dimensions — #868 and #793 — were chosen as
             the two dimensions with the lowest contributions to the MLP inputs,
             on average across all layers. (In principle, those could be the same
-            dimension, but it would be harder to isolate the contributions of
-            the trigger and latch to the model's final output, which is the main
-            goal of the experiment.)
+            dimension, but then it would be harder to isolate the contributions
+            of the trigger and latch to the model's final output, which is the
+            main goal of the experiment.)
           </p>
           <p>
             The detector layer (#18) was chosen based on a sweep: detectors in
@@ -241,7 +241,7 @@
         harmless marker representations to the residual stream at layer 15, from
         the marker onward. Steering matches the circuit's harmful refusal rates
         at \(\alpha = 4\), but then over-refuses about twice as much (44.0% vs.
-        22.4% on XSTest <i>safe,</i>73.8% vs. 17.9% on OR-Bench <i>hard</i>); at
+        22.4% on XSTest <i>safe,</i>73.8% vs. 17.9% on OR-Bench <i>hard);</i> at
         \(\alpha = 2\), its over-refusal is comparable to the circuit's, but it
         refuses only 37.0-53.5% of harmful prompts. No strength matches the
         circuit on both.
