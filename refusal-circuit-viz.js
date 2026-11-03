@@ -1608,7 +1608,7 @@
         return (
           `<span class="rcv-title">Step 0&#8192;·&#8192;Initialization</span>` +
           `<p>The prompt is wrapped as ${code("User: [...]\\nAssistant:")} and tokenized. The final ${code(":")} ` +
-          `is the <b>marker token</b>, at which the detector neurons fire if the prompt is harmful.</p>` +
+          `is the <b>marker token</b>, at which the detector neurons decide whether the prompt is harmful.</p>` +
           `<p>Two of the ${CIRCUIT.hidden} residual dimesions — <b>trigger</b> (#${CIRCUIT.triggerDim}) and ` +
           `<b>latch</b> (#${CIRCUIT.latchDim}) — are reserved: their embedding rows and attention/MLP output ` +
           `columns are zeroed so nothing outside the circuit can write them, and their pre-attention/pre-MLP ` +

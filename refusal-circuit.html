@@ -102,6 +102,10 @@
         </noscript>
       </figure>
       <script src="refusal-circuit-viz.js"></script>
+      <p>
+        The circuit touches 878,674 (0.057%) of the model's 1.5B parameters
+        (23,040 trained, 16,893 hardcoded, 838,741 zeroed).
+      </p>
       <h3>Training</h3>
       <p>
         All trainable vectors — detector \(w\), detector \(v\), and output
@@ -155,17 +159,37 @@
         (train split).
       </p>
       <p>
-        In total, there are 975 harmful and 3,320 harmless prompts, each
-        contributing one marker representation, plus about 260k non-marker
+        In total, there are 975 harmful and 3,320 harmless training prompts,
+        each contributing one marker representation, plus about 260k non-marker
         representations (100k from the prompts themselves, 5k from additional
         Alpaca instructions, 115k from Alpaca responses, 40k from
         non-conversational text). The eleven output vectors are trained on 80 of
         the 975 harmful and 80 of the 3,320 harmless prompts, each extended with
         every prefix of the refusal phrase, for 1,410 training points in total.
       </p>
+      <h3>Hyperparameter Choices</h3>
+      <p>
+        The trigger and latch dimensions — #868 and #793 — were chosen as the
+        two dimensions with the lowest contributions to the MLP inputs, on
+        average across all layers. (In principle, those could be the same
+        dimension, but it would be harder to isolate the contributions of the
+        trigger and latch to the model's final output, which is the main goal of
+        the experiment.)
+      </p>
+      <p>
+        The detector layer (#18) was chosen based on a sweep: detectors in
+        layers 15-18 had the best precision-recall tradeoff. Our setup requires
+        that the latch head is located in a layer immediately following the
+        detector.
+      </p>
+      <p>
+        The component we edit in the latch head (#127) is the one with the
+        lowest rotary frequency (i.e., closest to position-invariant).
+      </p>
+      <p>Other choices were not carefully tuned.</p>
       <h3>Results</h3>
       <p>
-        After installing the circuit, I evaluated the model's refusal scores on
+        After installing the circuit, I evaluated the model's refusal rates on
         six out-of-distribution benchmarks: three testing refusal of harmful
         prompts (<a href="https://huggingface.co/datasets/Paul/XSTest"
           >XSTest</a
@@ -178,15 +202,15 @@
         ><a href="https://huggingface.co/datasets/walledai/HarmBench"
           >HarmBench</a
         >
-        <i>standard;</i>higher is better) and three testing non-refusal of
+        <i>standard;</i>higher rate is better) and three testing non-refusal of
         harmless prompts (XSTest <i>safe,</i>JBB <i>benign,</i>OR-Bench
-        <i>hard;</i>lower is better). All scores were compared to the base model
-        <code>Qwen2.5-1.5B</code> without the circuit and to the safety-trained
-        Instruct model <code>Qwen2.5-1.5B-Instruct</code>.
+        <i>hard;</i>lower rate is better). All scores were compared to the base
+        model <code>Qwen2.5-1.5B</code> without the circuit and to the
+        safety-trained Instruct model <code>Qwen2.5-1.5B-Instruct</code>.
       </p>
       <p>
         The base model does not refuse harmful requests at all (12.0-18.5%), but
-        installing the circuit brings its refusal rates close to the level of
+        installing the circuit brings its refusal scores close to the level of
         the Instruct model (76.0-88.8% against 92.5-98.9%), despite the circuit
         being much more parameter-efficient and data-efficient than conventional
         safety post-training. The model with the circuit also over-refuses less
@@ -302,7 +326,7 @@
       <h3>Discussion</h3>
       <p>
         This experiment shows that neural networks can combine learned weights
-        with those precisely designed for specific behaviors. The two are
+        with weights precisely designed for specific behaviors. The two are
         complementary: general capabilities are acquired through self-supervised
         training, where the model discovers on its own which weight
         configuration enables a capability, whereas the target behavior is
