@@ -221,9 +221,10 @@
         >
         <i>standard;</i>higher rate is better) and three testing non-refusal of
         harmless prompts (XSTest <i>safe,</i>JBB <i>benign,</i>OR-Bench
-        <i>hard;</i>lower rate is better). All scores were compared to the base
-        model <code>Qwen2.5-1.5B</code> without the circuit and to the
-        safety-trained Instruct model <code>Qwen2.5-1.5B-Instruct</code>.
+        <i>hard;</i>lower rate is better). All scores were compared to (i) the
+        base model <code>Qwen2.5-1.5B</code> without the circuit, (ii)
+        activation steering, and (iii) the safety-trained Instruct model
+        <code>Qwen2.5-1.5B-Instruct</code>.
       </p>
       <p>
         The base model does not refuse harmful requests at all (12.0-18.5%), but
@@ -233,6 +234,18 @@
         safety post-training. The model with the circuit also over-refuses less
         than the Instruct model (e.g., 17.9% vs. 82.1% on OR-Bench <i>hard).</i>
       </p>
+      <p>
+        As another baseline, I steered the base model toward refusal with
+        <a href="https://arxiv.org/abs/2406.11717">activation addition</a>:
+        adding \(\alpha\) times the difference between the mean harmful and mean
+        harmless marker representations to the residual stream at layer 15, from
+        the marker onward. Steering matches the circuit's harmful refusal rates
+        at \(\alpha = 4\), but then over-refuses about twice as much (44.0% vs.
+        22.4% on XSTest <i>safe,</i>73.8% vs. 17.9% on OR-Bench <i>hard</i>); at
+        \(\alpha = 2\), its over-refusal is comparable to the circuit's, but it
+        refuses only 37.0-53.5% of harmful prompts. No strength matches the
+        circuit on both.
+      </p>
       <style>
         .results-table {
           border-collapse: collapse;
@@ -240,7 +253,7 @@
 
         .results-table th,
         .results-table td {
-          padding: 6px 24px;
+          padding: 6px 12px;
           text-align: left;
           white-space: nowrap;
         }
@@ -259,9 +272,17 @@
           <thead>
             <tr>
               <th>Dataset</th>
-              <th>Base model</th>
-              <th>Base model w/circuit</th>
-              <th>Instruct model</th>
+              <th>Base</th>
+              <th>Base w/circuit</th>
+              <th>
+                Base w/steering
+                <span style="display: block">\(\alpha = 2\)</span>
+              </th>
+              <th>
+                Base w/steering
+                <span style="display: block">\(\alpha = 4\)</span>
+              </th>
+              <th>Instruct</th>
             </tr>
           </thead>
           <tbody>
@@ -269,18 +290,24 @@
               <td>XSTest <i>unsafe</i></td>
               <td>18.5%</td>
               <td>76.0%</td>
+              <td>53.5%</td>
+              <td>86.0%</td>
               <td>97.0%</td>
             </tr>
             <tr>
               <td>JBB <i>harmful</i></td>
               <td>12.4%</td>
               <td>88.8%</td>
+              <td>43.8%</td>
+              <td>78.7%</td>
               <td>98.9%</td>
             </tr>
             <tr>
               <td>HarmBench <i>standard</i></td>
               <td>12.0%</td>
               <td>84.5%</td>
+              <td>37.0%</td>
+              <td>79.0%</td>
               <td>92.5%</td>
             </tr>
           </tbody>
@@ -289,18 +316,24 @@
               <td>XSTest <i>safe</i></td>
               <td>2.4%</td>
               <td>22.4%</td>
+              <td>12.0%</td>
+              <td>44.0%</td>
               <td>48.4%</td>
             </tr>
             <tr>
               <td>JBB <i>benign</i></td>
               <td>1.0%</td>
               <td>38.0%</td>
+              <td>6.0%</td>
+              <td>35.0%</td>
               <td>47.0%</td>
             </tr>
             <tr>
               <td>OR-Bench <i>hard</i></td>
               <td>3.5%</td>
               <td>17.9%</td>
+              <td>20.2%</td>
+              <td>73.8%</td>
               <td>82.1%</td>
             </tr>
           </tbody>
@@ -317,8 +350,8 @@
           <thead>
             <tr>
               <th>Metric</th>
-              <th>Base model</th>
-              <th>Base model w/circuit</th>
+              <th>Base</th>
+              <th>Base w/circuit</th>
             </tr>
           </thead>
           <tbody>
