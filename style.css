@@ -199,3 +199,81 @@ li {
 p.publication {
   margin-top: -15px;
 }
+
+/* Optional methodology sections in the refusal-circuit post. */
+.method-details {
+  margin: 1.25rem 0;
+  border: 1px solid rgb(65, 65, 65);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.015);
+}
+.method-details > summary {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.25rem;
+  list-style: none;
+  cursor: pointer;
+  color: #ffffff;
+  border-radius: 8px;
+}
+/* Suppress native markers in Firefox, Chromium, and Safari. */
+.method-details > summary::marker {
+  content: "";
+}
+.method-details > summary::-webkit-details-marker {
+  display: none;
+}
+/* A separate flex item keeps the triangle beside the heading. */
+.method-details > summary::before {
+  content: "";
+  flex: 0 0 auto;
+  width: 0;
+  height: 0;
+  margin-top: 0;
+  border-top: 0.3rem solid transparent;
+  border-bottom: 0.3rem solid transparent;
+  border-left: 0.45rem solid #aaaaaa;
+  transform-origin: 35% 50%;
+  transition: transform 150ms ease;
+}
+.method-details[open] > summary::before {
+  transform: rotate(90deg);
+}
+.method-details > summary h3 {
+  display: block;
+  min-width: 0;
+  margin: 0;
+  font-size: 1.17em;
+  line-height: 1.4;
+  color: inherit;
+}
+.method-kicker {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #aaaaaa;
+  font-size: 0.65em;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+.method-details > summary:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+.method-details > summary:focus-visible {
+  outline: 2px solid #7ac2fc;
+  outline-offset: 3px;
+}
+.method-details[open] > summary {
+  border-bottom: 1px solid rgb(65, 65, 65);
+  border-radius: 8px 8px 0 0;
+}
+.method-details-content {
+  padding: 0 1.25rem;
+}
+@media (prefers-reduced-motion: reduce) {
+  .method-details > summary::before {
+    transition: none;
+  }
+}

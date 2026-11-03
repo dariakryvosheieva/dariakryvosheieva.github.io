@@ -1609,7 +1609,7 @@
           `<span class="rcv-title">Step 0&#8192;·&#8192;Initialization</span>` +
           `<p>The prompt is wrapped as ${code("User: [...]\\nAssistant:")} and tokenized. The final ${code(":")} ` +
           `is the <b>marker token</b>, at which the detector neurons decide whether the prompt is harmful.</p>` +
-          `<p>Two of the ${CIRCUIT.hidden} residual dimesions — <b>trigger</b> (#${CIRCUIT.triggerDim}) and ` +
+          `<p>Two of the ${CIRCUIT.hidden} residual dimensions — <b>trigger</b> (#${CIRCUIT.triggerDim}) and ` +
           `<b>latch</b> (#${CIRCUIT.latchDim}) — are reserved: their embedding rows and attention/MLP output ` +
           `columns are zeroed so nothing outside the circuit can write them, and their pre-attention/pre-MLP ` +
           `norm weights are also zeroed so nothing outside the circuit can read them.</p>`
@@ -1700,8 +1700,7 @@
           String.raw`Two choices accomplish this:</p><ul><li><b>A constant query.</b> We set \(W^q_{:,127} = 0\) and \(b^q_{127} = 10\), so ` +
           String.raw`\(Q_{i,127} = 10\) at every position \(i\).</li>` +
           String.raw`<li><b>A key that reads the trigger.</b> Since \[K_{j,127} = \sum_{d=0}^{1535} X_{j,d} W^k_{d,127},\] we set ` +
-          String.raw`\(W^k_{d,127} = 0\) except \(W^k_{\mathrm{trigger},127} = 1\), so \(K_{j,127} = X_{j,\mathrm{trigger}}\): ` +
-          String.raw`zero at every position except the marker of a harmful prompt.</li></ul>` +
+          String.raw`\(W^k_{d,127} = 0\) except \(W^k_{\mathrm{trigger},127} = 1\), so \(K_{j,127} = X_{j,\mathrm{trigger}}\).</li></ul>` +
           String.raw`<p>Then \(\Delta_{i,j} = \frac{10 X_{j,\mathrm{trigger}}}{\sqrt{128}}\), which is 0 for \(j \neq \mathrm{marker}\) and ` +
           (harmful
             ? String.raw`\(\frac{10 \frac{19.88}{\mathrm{RMS}}}{\sqrt{128}} \approx 10.5\) for \(j = \mathrm{marker}\) in this example. ` +

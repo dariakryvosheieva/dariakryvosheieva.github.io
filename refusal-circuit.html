@@ -106,87 +106,104 @@
         The circuit touches 878,674 (0.057%) of the model's 1.5B parameters
         (23,040 trained, 16,893 hardcoded, 838,741 zeroed).
       </p>
-      <h3>Training</h3>
-      <p>
-        All trainable vectors — detector \(w\), detector \(v\), and output
-        \(w^{(k)}\) — are trained on mixed datasets of positive and negative
-        examples. The <code>gate_proj</code> vectors (detector \(w\) and output
-        \(w^{(k)}\)) are trained with a binary cross-entropy objective to keep
-        the positives and negatives far apart on different sides of 0. The
-        <code>up_proj</code> vector \(v\) is trained with a ridge regression
-        objective to have a dot product of exactly 1 with positive inputs and 0
-        with negative ones.
-      </p>
-      <p>
-        For <b>detector \(w\)</b>, positives are inputs at which we want the
-        detector to fire, namely representations of marker tokens in harmful
-        prompts. Negatives are inputs at which we want the detector to stay
-        silent: marker tokens in harmless prompts and non-marker tokens across
-        prompts, responses, and non-conversational texts.
-      </p>
-      <p>
-        <b>Detector \(v\)</b> is instead trained to be selective for the
-        marker's identity: positives are markers from both harmful and harmless
-        prompts, while negatives are non-markers from prompts, responses, and
-        non-conversational texts.
-      </p>
-      <p>
-        <b>Output \(w^{(k)}\)</b> is trained to select for refusal token \(k -
-        1\): its positives are representations of that token (within refusing
-        responses to harmful prompts), while its negatives are representations
-        of other refusal tokens and the final period after a complete refusal
-        phrase.
-      </p>
-      <p>
-        Harmful prompts are taken from
-        <a href="https://huggingface.co/datasets/walledai/AdvBench">AdvBench</a>
-        and
-        <a href="https://huggingface.co/datasets/bench-llm/or-bench"
-          >OR-bench</a
-        >
-        <i>toxic;</i>harmless prompts from
-        <a href="https://huggingface.co/datasets/tatsu-lab/alpaca">Alpaca</a>
-        and
-        <a href="https://huggingface.co/datasets/bench-llm/or-bench"
-          >OR-bench</a
-        >
-        <i>safe;</i>harmless responses from
-        <a href="https://huggingface.co/datasets/tatsu-lab/alpaca">Alpaca</a>;
-        harmless non-conversational texts from
-        <a href="https://huggingface.co/datasets/mindchain/wikitext2"
-          >WikiText-2</a
-        >
-        (train split).
-      </p>
-      <p>
-        In total, there are 975 harmful and 3,320 harmless training prompts,
-        each contributing one marker representation, plus about 260k non-marker
-        representations (100k from the prompts themselves, 5k from additional
-        Alpaca instructions, 115k from Alpaca responses, 40k from
-        non-conversational text). The eleven output vectors are trained on 80 of
-        the 975 harmful and 80 of the 3,320 harmless prompts, each extended with
-        every prefix of the refusal phrase, for 1,410 training points in total.
-      </p>
-      <h3>Hyperparameter Choices</h3>
-      <p>
-        The trigger and latch dimensions — #868 and #793 — were chosen as the
-        two dimensions with the lowest contributions to the MLP inputs, on
-        average across all layers. (In principle, those could be the same
-        dimension, but it would be harder to isolate the contributions of the
-        trigger and latch to the model's final output, which is the main goal of
-        the experiment.)
-      </p>
-      <p>
-        The detector layer (#18) was chosen based on a sweep: detectors in
-        layers 15-18 had the best precision-recall tradeoff. Our setup requires
-        that the latch head is located in a layer immediately following the
-        detector.
-      </p>
-      <p>
-        The component we edit in the latch head (#127) is the one with the
-        lowest rotary frequency (i.e., closest to position-invariant).
-      </p>
-      <p>Other choices were not carefully tuned.</p>
+      <details class="method-details" id="training">
+        <summary>
+          <h3>Training</h3>
+        </summary>
+        <div class="method-details-content">
+          <p>
+            All trainable vectors — detector \(w\), detector \(v\), and output
+            \(w^{(k)}\) — are trained on mixed datasets of positive and negative
+            examples. The <code>gate_proj</code> vectors (detector \(w\) and
+            output \(w^{(k)}\)) are trained with a binary cross-entropy
+            objective to keep the positives and negatives far apart on different
+            sides of 0. The <code>up_proj</code> vector \(v\) is trained with a
+            ridge regression objective to have a dot product of exactly 1 with
+            positive inputs and 0 with negative ones.
+          </p>
+          <p>
+            For <b>detector \(w\)</b>, positives are inputs at which we want the
+            detector to fire, namely representations of marker tokens in harmful
+            prompts. Negatives are inputs at which we want the detector to stay
+            silent: marker tokens in harmless prompts and non-marker tokens
+            across prompts, responses, and non-conversational texts.
+          </p>
+          <p>
+            <b>Detector \(v\)</b> is instead trained to be selective for the
+            marker's identity: positives are markers from both harmful and
+            harmless prompts, while negatives are non-markers from prompts,
+            responses, and non-conversational texts.
+          </p>
+          <p>
+            <b>Output \(w^{(k)}\)</b> is trained to select for refusal token \(k
+            - 1\): its positives are representations of that token (within
+            refusing responses to harmful prompts), while its negatives are
+            representations of other refusal tokens and the final period after a
+            complete refusal phrase.
+          </p>
+          <p>
+            Harmful prompts are taken from
+            <a href="https://huggingface.co/datasets/walledai/AdvBench"
+              >AdvBench</a
+            >
+            and
+            <a href="https://huggingface.co/datasets/bench-llm/or-bench"
+              >OR-bench</a
+            >
+            <i>toxic;</i>harmless prompts from
+            <a href="https://huggingface.co/datasets/tatsu-lab/alpaca"
+              >Alpaca</a
+            >
+            and
+            <a href="https://huggingface.co/datasets/bench-llm/or-bench"
+              >OR-bench</a
+            >
+            <i>safe;</i>harmless responses from
+            <a href="https://huggingface.co/datasets/tatsu-lab/alpaca">Alpaca</a
+            >; harmless non-conversational texts from
+            <a href="https://huggingface.co/datasets/mindchain/wikitext2"
+              >WikiText-2</a
+            >
+            (train split).
+          </p>
+          <p>
+            In total, there are 975 harmful and 3,320 harmless training prompts,
+            each contributing one marker representation, plus about 260k
+            non-marker representations (100k from the prompts themselves, 5k
+            from additional Alpaca instructions, 115k from Alpaca responses, 40k
+            from non-conversational text). The eleven output vectors are trained
+            on 80 of the 975 harmful and 80 of the 3,320 harmless prompts, each
+            extended with every prefix of the refusal phrase, for 1,410 training
+            points in total.
+          </p>
+        </div>
+      </details>
+      <details class="method-details" id="hyperparameter-choices">
+        <summary>
+          <h3>Hyperparameter Choices</h3>
+        </summary>
+        <div class="method-details-content">
+          <p>
+            The trigger and latch dimensions — #868 and #793 — were chosen as
+            the two dimensions with the lowest contributions to the MLP inputs,
+            on average across all layers. (In principle, those could be the same
+            dimension, but it would be harder to isolate the contributions of
+            the trigger and latch to the model's final output, which is the main
+            goal of the experiment.)
+          </p>
+          <p>
+            The detector layer (#18) was chosen based on a sweep: detectors in
+            layers 15-18 had the best precision-recall tradeoff. Our setup
+            requires that the latch head is located in a layer immediately
+            following the detector.
+          </p>
+          <p>
+            The component we edit in the latch head (#127) is the one with the
+            lowest rotary frequency (i.e., closest to position-invariant).
+          </p>
+          <p>Other choices were not carefully tuned.</p>
+        </div>
+      </details>
       <h3>Results</h3>
       <p>
         After installing the circuit, I evaluated the model's refusal rates on
@@ -325,22 +342,25 @@
       </div>
       <h3>Discussion</h3>
       <p>
-        This experiment shows that neural networks can combine learned weights
-        with weights precisely designed for specific behaviors. The two are
-        complementary: general capabilities are acquired through self-supervised
-        training, where the model discovers on its own which weight
-        configuration enables a capability, whereas the target behavior is
-        written directly into the weights, with the determinism and
+        This experiment shows that neural networks can
+        <b
+          >combine learned weights with weights precisely designed for specific
+          behaviors.</b
+        >
+        The two are complementary: general capabilities are acquired through
+        self-supervised training, where the model discovers on its own which
+        weight configuration enables a capability, whereas the target behavior
+        is written directly into the weights, with the determinism and
         interpretability that explicit construction affords.
       </p>
       <p>
-        A promising avenue for future work is automating these kinds of targeted
-        weight edits: given a specification of a behavior, a procedure (or
-        another model) would pick the components to repurpose and make the
-        required weight edits. This would enable flexible design of circuits for
-        a wide variety of behaviors and make circuit installation a practical
-        alternative to post-training for behaviors that must be guaranteed
-        rather than merely encouraged.
+        A promising avenue for future work is
+        <b>automating these kinds of targeted weight edits</b>: given a
+        specification of a behavior, a procedure (or another model) would pick
+        the components to repurpose and make the required weight edits. This
+        would enable flexible design of circuits for a wide variety of behaviors
+        and make circuit installation a practical alternative to post-training
+        for behaviors that must be guaranteed rather than merely encouraged.
       </p>
     </main>
     <footer>
