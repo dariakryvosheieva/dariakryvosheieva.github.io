@@ -26,6 +26,43 @@
     <main>
       <div class="project">
         <div class="project-header-container">
+          <i>November 2026</i>
+          <img
+            class="pictogram"
+            src="images/pictograms/refusal-circuit.svg"
+            alt=""
+          />
+        </div>
+        <h2 class="project">Installing a refusal circuit into a language model</h2>
+        <a
+          class="project-url"
+          href="https://github.com/dariakryvosheieva/refusal-circuit"
+          >https://github.com/dariakryvosheieva/refusal-circuit</a
+        >
+        <img class="main-body" src="images/refusal-circuit.png" />
+        <p>
+          In this experiment, I rewrote a set of weights in a Qwen model to
+          predict the exact sequence
+          <code>I'm sorry, I cannot assist with this request.</code> A pair of MLP
+          neurons in the same model is trained to serve as a harmfulness detector:
+          if the detector fires, the input is routed through the circuit and the
+          model generates the refusal sequence; otherwise, the input is routed
+          through the remainder of the model and generations remain (essentially)
+          intact.
+        </p>
+        <p>
+          With the installed circuit, the base model
+          <code>Qwen2.5-1.5B</code> nearly matches the refusal rates of the
+          safety-trained <code>Qwen2.5-1.5B-Instruct</code>, at a perplexity cost
+          of only 0.4% relative to the base model without the circuit. Even more
+          importantly, this approach to refusal is interpretable by construction:
+          if the model under- or over-refused, we can see precisely what went
+          wrong.
+        </p>
+        <p>More details are available in the <a href="https://dariakryvosheieva.github.io/refusal-circuit.html">blog post</a>.</p>
+      </div>
+      <div class="project">
+        <div class="project-header-container">
           <i>August 2026</i>
           <img
             class="pictogram"
