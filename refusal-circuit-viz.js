@@ -1,13 +1,3 @@
-/* Interactive walkthrough of the installed refusal circuit in Qwen2.5-1.5B.
- *
- * Renders into the element with id "refusal-circuit-viz".
- * Loads MathJax 4 from jsDelivr unless MathJax is already on the page.
- * Include this file after a <div id="refusal-circuit-viz"></div>, or use defer.
- * HTML equations use \( ... \); SVG labels remain plain text.
- *
- * All numbers are traced from the installed model (checkpoint
- * refusal_circuit_qwen1.5b_base.pt) on the two prompts shown.
- */
 (function () {
   "use strict";
 

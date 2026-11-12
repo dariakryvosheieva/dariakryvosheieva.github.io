@@ -277,3 +277,63 @@ p.publication {
     transition: none;
   }
 }
+
+/* Tabbed results in the self-steering post. */
+.results-tabs {
+  display: flex;
+  gap: 0.25rem;
+  box-sizing: border-box;
+  width: fit-content;
+  max-width: 100%;
+  margin: 1.25rem auto 1rem;
+  padding: 0.3rem;
+  border: 1px solid rgb(65, 65, 65);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.015);
+  /* Narrow screens scroll the tab bar instead of wrapping it. */
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.results-tabs::-webkit-scrollbar {
+  display: none;
+}
+.results-tab {
+  flex: 0 0 auto;
+  padding: 0.45rem 1.1rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: rgb(195, 195, 195);
+  font: inherit;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 150ms ease,
+    color 150ms ease;
+}
+.results-tab:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: #ffffff;
+}
+.results-tab[aria-selected="true"] {
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+}
+/* Inset so the scrolling tab bar does not clip the focus ring. */
+.results-tab:focus-visible {
+  outline: 2px solid #7ac2fc;
+  outline-offset: -2px;
+}
+.results-panel {
+  margin: 0 0 1.25rem;
+  padding: 0.25rem 1.25rem 1.25rem;
+  border: 1px solid rgb(65, 65, 65);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.015);
+}
+@media (prefers-reduced-motion: reduce) {
+  .results-tab {
+    transition: none;
+  }
+}

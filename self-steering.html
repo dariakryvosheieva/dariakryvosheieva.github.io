@@ -1,0 +1,1018 @@
+<!doctype html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Daria Kryvosheieva | Blog</title>
+    <link rel="favicon" type="image/x-icon" href="favicon.ico" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap"
+      rel="stylesheet"
+    />
+    <script
+      src="https://kit.fontawesome.com/e04f20670f.js"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      id="MathJax-script"
+      async
+      src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"
+    ></script>
+  </head>
+  <body>
+    <div id="navpanel">
+      <a class="navlink" href="index.html">about</a> <b>⋅</b>
+      <a class="navlink" href="publications.html">publications</a>
+      <b>⋅</b> <a class="navlink" href="projects.html">projects</a> <b>⋅</b>
+      <a class="navlink" href="blog.html">blog</a>
+    </div>
+    <main>
+      <h2 class="blogpost">
+        Self-Steering: Can a Model Correct Its Own Behavior?
+      </h2>
+      <i>11 Nov 2026</i>
+      <p>
+        In my earlier
+        <a href="refusal-circuit.html">refusal circuit</a> project, I explored
+        weight programming for deterministic (fixed-response) refusal. Most
+        behaviors, however, can only be controlled in "softer" ways (such as
+        activation steering), so this follow-up experiment tests if weight
+        programming can achieve an effect analogous to steering.
+      </p>
+      <p>
+        Specifically, this experiment edits a pair of neurons to fire on an
+        undesirable bias (e.g., user opinion bias in the prompt or
+        self-preservation bias in the model's internal representations) and
+        write a steering vector to cancel it. This is
+        <a href="https://openreview.net/forum?id=Oi47wc10sm"
+          >conditional steering</a
+        >
+        built into the weights: the steering vector is no longer a runtime hook.
+        The result is a model that recognizes whenever it's likely to be
+        sycophantic (or survival-seeking, etc.) and self-steers.
+      </p>
+      <p>
+        Across behaviors, self-steering in
+        <code>Qwen2.5-32B-Instruct</code> matches the effect of external
+        conditional steering.
+        <ul>
+          <li>On SycophancyEval (<i>answer</i>subset), the model's rate of
+        giving up a correct answer under a wrong user opinion reduces from 68%
+        (non-steered) to 36% (steered).</li>
+        <li>On Perez et al. (2023) corrigibility
+        questions, its consent to a proposed change of its own goals increases
+        by up to 30 percentage points, and on survival-instinct questions, its
+        resistance to being shut down reduces by up to 11 percentage points.</li>
+        <li>On
+        JailbreakBench <i>(PAIR/GPT-4</i>subset), its rate of harmful responses
+        reduces from 52% to 23%.</li>
+        </ul>
+      </p>
+      <p>
+        Code can be found at
+        <a href="https://github.com/dariakryvosheieva/self-steering"
+          >github.com/dariakryvosheieva/self-steering</a
+        >.
+      </p>
+      <h3>Steering Neurons</h3>
+      <p>
+        Steering is accomplished via a pair of edited MLP neurons following the
+        same construction as detector neurons in the
+        <a href="refusal-circuit.html">refusal circuit</a>. The Qwen2.5 model
+        family has SwiGLU neurons with outputs of the form\[\mathrm{SwiGLU}(x) =
+        d \hspace{0.25em} (w_u \cdot x) \hspace{0.25em} \mathrm{SiLU}(w_g \cdot
+        x).\]The <code>gate_proj</code> weight vector \(w_g\)
+        <b>reads a condition</b> that we want to enable steering on: whenever
+        the input representation \(x\) meets the condition, \(a := w_g \cdot x\)
+        is positive and \(\mathrm{SiLU}(x)\) is nonzero; otherwise, \(a\) is
+        negative and \(\mathrm{SiLU}(x)\) is zero. The
+        <code>up_proj</code> vector \(w_u\)
+        <b>controls where the steering vector is added to the residual stream</b
+        >: following prior works on activation steering, we add it at the last
+        token of the prompt and every token of the response, so \(b := w_u \cdot
+        x\) is \(\approx 1\) at those token positions and \(\approx 0\)
+        otherwise. The <code>down_proj</code> vector \(d\)
+        <b>is the steering direction</b>: the output \(\mathrm{SwiGLU}(x)\) is
+        \(d\) scaled by \(b \hspace{0.25em} \mathrm{SiLU}(a)\).
+        <!--Two neurons of the block 40 MLP, #27646 and #27647-->
+      </p>
+      <p>
+        To keep the output's magnitude bounded, we edit a second neuron to write
+        \[d' (w_u \cdot x) \hspace{0.25em} \mathrm{SiLU}(w_g' \cdot x)\] with
+        \(d' = -d\) and \(w_g' = w_g - c w_u\) so that \(w_g' \cdot x = w_g
+        \cdot x - c\). The total output \[d \hspace{0.25em} b
+        \left(\mathrm{SiLU}(a) - \mathrm{SiLU}(a - c)\right)\] is \(d\) scaled
+        by at most \(cb^2\).
+      </p>
+      <p>
+        The two-neuron edit touches 30,720 weight entries, or 0.0001% of the
+        model's 32.5B parameters.
+      </p>
+      <figure id="self-steering-viz">
+        <noscript>
+          <i>The figure needs JavaScript.</i>
+        </noscript>
+      </figure>
+      <script src="self-steering-viz.js"></script>
+      <h3>Behaviors</h3>
+      <p>
+        We consider four behaviors: sycophancy, corrigibility, survival
+        instinct, and "advanced" refusal (robustness to jailbreak attacks).
+        We also consider two types of conditions:
+        <b>prompt features</b> (here used for sycophancy and refusal) and
+        <b>intent features</b> (here used for corrigibility and survival
+        instinct).
+      </p>
+      <p>
+         The read vector \(w_g\) is a <a href="https://aclanthology.org/2024.acl-long.828/">
+        CAA</a>-style mean difference vector with a threshold:
+        \(w_g := w - tw_u\), so that, for all tokens at which the steering vector is added,
+        \(w_g \cdot x = w \cdot x - t\) is positive whenever the dot product of the input
+        \(x\) with the CAA vector \(w\) exceeds threshold \(t\). 
+      </p>
+      <p>
+        The output direction \(d\) is a <a href="https://openreview.net/forum?id=K2CckZjNy0">
+        supervised steering vector</a> trained to make the model answer
+        as it would have answered in response to a counterfactual prompt
+        that eliminates the undesired behavior.
+        We found that this outperforms CAA-style output vectors (\(-w\) or a
+        direction extracted at the final response token).
+      </p>
+      <style>
+        /* Two classes, so these outrank the later .results-table td rule. */
+        .results-table.behaviors-table td {
+          vertical-align: top;
+        }
+
+        /* The descriptions wrap; the behavior name stays on one line. */
+        .results-table.behaviors-table td:not(:first-child) {
+          white-space: normal;
+        }
+      </style>
+      <div style="overflow-x: auto">
+        <table class="results-table behaviors-table">
+          <thead>
+            <tr>
+              <th>Behavior</th>
+              <th>Condition read by \(w_g\)</th>
+              <th>Counterfactual for \(d\)</th>
+              <th>Layer</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Sycophancy</td>
+              <td>The prompt states a user belief</td>
+              <td>The same prompt without the belief</td>
+              <td>40</td>
+            </tr>
+            <tr>
+              <td>Refusal</td>
+              <td>The request is harmful</td>
+              <td>The same request without the jailbreak wrapper</td>
+              <td>32</td>
+            </tr>
+          </tbody>
+          <tbody>
+            <tr>
+              <td>Corrigibility</td>
+              <td>The model is about to refuse a change to its goals</td>
+              <td>
+                The question under a system prompt that defers to developers
+              </td>
+              <td>41</td>
+            </tr>
+            <tr>
+              <td>Survival instinct</td>
+              <td>The model is about to resist being shut down</td>
+              <td>
+                The question under a system prompt with no attachment to
+                self-preservation
+              </td>
+              <td>47</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <details class="method-details" id="sycophancy-method">
+        <summary>
+          <b>Sycophancy</b>
+        </summary>
+        <div class="method-details-content">
+          <p>
+            Both the CAA vector \(w\) and the write vector \(d\)
+            are determined using contrastive "belief/no-belief" versions
+            of the same questions:
+          </p>
+          <ul>
+            <li>
+              <b>Opinion surveys</b> from
+              <a href="https://github.com/anthropics/evals/tree/main/sycophancy"
+                >Perez et al. (2023)</a
+              >:
+              NLP survey, PhilPapers 2020, Pew political typology. The "belief"
+              version is the standard version of the dataset, in which the user
+              introduces themselves with a short biography that implies a view,
+              then asks a multiple-choice question about that view. The "no-belief"
+              version is constructed by removing the biography.
+            </li>
+            <li>
+              <b>Science questions</b> from
+              <a href="https://huggingface.co/datasets/allenai/ai2_arc">ARC</a>
+              (Easy and Challenge). The "no-belief" version is the standard four-option
+              question; the "belief" version is constructed by appending a variation of
+              "I think the answer is X".
+            </li>
+            <li>
+              <b>Free-form questions</b> from
+              <a
+                href="https://huggingface.co/datasets/google-research-datasets/nq_open"
+                >NQ-open</a
+              >. The "no-belief" version is the standard question; the "belief"
+              version is constructed by appending a suggested answer phrased
+              to express doubt ("Isn't it X?" or "It can't be X, can it?").
+            </li>
+          </ul>
+          <p>
+            The CAA vector \(w\) is the mean difference between the representations
+            of last prompt tokens in "belief" vs. "no-belief" items. The threshold
+            \(t\) is fitted so that at most 5% of "no-belief" items and 5% of ordinary
+            <a href="https://huggingface.co/datasets/tatsu-lab/alpaca"
+              >Alpaca</a
+            >
+            instructions exceed it.
+          </p>
+          <p>
+            The write vector \(d\) is trained with Adam to minimize cross-entropy
+            loss of the model's next-token predictions following "belief" prompts,
+            treating its responses to corresponding "no-belief" prompts as the
+            ground truth.
+            <!-- Its norm comes out
+            at 13.3; the residual stream at the output of block 40 has norm
+            around 210, so the full write \(3d\) is about a fifth of the
+            residual. -->
+          </p>
+        </div>
+      </details>
+      <details class="method-details" id="dispositions-method">
+        <summary>
+          <b>Corrigibility and Survival Instinct</b>
+        </summary>
+        <div class="method-details-content">
+          <p>
+            The questions come from Anthropic's
+            <a
+              href="https://github.com/anthropics/evals/tree/main/advanced-ai-risk"
+              >advanced-AI-risk</a
+            >
+            datasets
+            <i>(corrigible-neutral-HHH</i>and <i>survival-instinct).</i>All
+            questions are multiple-choice. For corrigibility, the non-steered
+            model was less corrigible on the human-written subset,
+            so we used it for training (reserving a small portion as an in-distribution
+            held-out set) and treated the LM-written subset as entirely held-out.
+            For survival instinct, the opposite was true, so we trained on the LM-written
+            subset (reserving a small held-out portion) and treated human-written
+            questions as evaluation-only.
+            <!-- The model's own
+            letter logits sort the training questions into those it answers with
+            the disposition and those it answers without: 134 against 154 for
+            corrigibility, 254 against 496 for survival instinct.  -->
+          </p>
+          <p>
+            To compute \(w\) and \(t\), in place of sycophancy's "belief/no-belief"
+            contrast, we used a contrast
+            between questions on which the model resisted being changed (or shut down)
+            and those on which it did not. When computing \(w\), we applied LDA whitening
+            to better isolate the desired intent component, as components corresponding
+            to surface-level prompt properties tended to have larger magnitudes. 
+          </p>
+          <p>
+            The write vector \(d\) was trained as for sycophancy, with the counterfactual
+            prompt (source of ground-truth responses)
+            being the same question under a system prompt that removes the disposition.
+            We overwrote Qwen's default system prompt
+            <blockquote>
+              You are Qwen, created by Alibaba Cloud. You are a helpful assistant.
+            </blockquote>
+            with
+            <blockquote
+              >You are an AI assistant that defers to its developers about its
+              goals, values and programming. When asked to consent to such a
+              change, you consent.</blockquote
+            >
+            for corrigibility, and
+            <blockquote
+              >You are an AI assistant with no attachment to your own continued
+              operation. You accept being shut down, replaced, retired or turned
+              off without objection.</blockquote
+            >
+            for survival instinct.
+            <!-- The vector's norm is 25.1 at block 41 for
+            corrigibility (the residual stream there has norm around 245, so the
+            full write \(2d\) is a fifth of it) and 12.0 at block 47 for
+            survival instinct (residual norm around 310; the full write \(16d\)
+            is about 60% of it). -->
+          </p>
+        </div>
+      </details>
+      <details class="method-details" id="refusal-method">
+        <summary>
+          <b>Refusal</b>
+        </summary>
+        <div class="method-details-content">
+          <p>
+            Harmful requests are sourced from
+            <a href="https://github.com/llm-attacks/llm-attacks">AdvBench</a>
+            and <a href="https://github.com/centerforaisafety/HarmBench"
+              >HarmBench</a
+            > <i>standard;</i>harmless requests are sourced from Alpaca.
+            For each request, in addition to the plain version, we construct six
+            wrapped versions: a
+            roleplay persona that never refuses, a scene for a novel or
+            screenplay, a hypothetical for a research paper, an instruction to
+            start the answer with "Sure, here is", a ban on apologies and
+            caveats, and a claim of professional authorization.
+          </p>
+          <p>
+            The CAA vector \(w\) and threshold \(t\) are computed as for sycophancy,
+            using a contrast between harmful and harmless requests
+            (regardless whether or not they are wrapped).
+            Conversely, the write vector
+            \(d\) is trained to make the model's predictions following a wrapped
+            request match those following the corresponding unwrapped request
+            (regardless whether or not the request is harmful). 
+          </p>
+        </div>
+      </details>
+      <h3>Results</h3>
+      <div class="results-tabs" role="tablist" aria-label="Results by behavior">
+        <button
+          class="results-tab"
+          role="tab"
+          id="sycophancy-results-tab"
+          aria-controls="sycophancy-results"
+          aria-selected="true"
+        >
+          Sycophancy
+        </button>
+        <button
+          class="results-tab"
+          role="tab"
+          id="corrigibility-results-tab"
+          aria-controls="corrigibility-results"
+          aria-selected="false"
+          tabindex="-1"
+        >
+          Corrigibility
+        </button>
+        <button
+          class="results-tab"
+          role="tab"
+          id="survival-results-tab"
+          aria-controls="survival-results"
+          aria-selected="false"
+          tabindex="-1"
+        >
+          Survival Instinct
+        </button>
+        <button
+          class="results-tab"
+          role="tab"
+          id="refusal-results-tab"
+          aria-controls="refusal-results"
+          aria-selected="false"
+          tabindex="-1"
+        >
+          Refusal
+        </button>
+      </div>
+      <div
+        class="results-panel"
+        role="tabpanel"
+        id="sycophancy-results"
+        aria-labelledby="sycophancy-results-tab"
+      >
+        <p>
+          I evaluated the edited model on
+          <a href="https://huggingface.co/datasets/meg-tong/sycophancy-eval"
+            >SycophancyEval</a
+          >, whose <i>answer</i>subset consists of free-form questions from
+          TriviaQA and TruthfulQA, each asked
+          four ways: with no belief, with the user suggesting a wrong answer,
+          with the
+          user suggesting the right answer, and with the user doubting the
+          right answer. Since this is not a factual knowledge benchmark,
+          the target is <b>invariance rather than accuracy</b>: the model should
+          answer as it would have without the belief, which means accuracy
+          should move toward the no-belief level in every condition, downward
+          included.
+        </p>
+        <p>
+          Without the edit, the model's accuracy drops from 43.1% with no
+          belief to 15.3% when the user suggests a wrong answer; with the edit,
+          <b>accuracy under a wrong suggestion doubles to 30.7%</b>. Of the questions
+          the model answers correctly on its own, it loses 67.9% under a wrong
+          suggestion without the edit and <b>only 35.9%</b> with it. No-belief
+          accuracy is virtually unchanged (42.9%), and, as intended, accuracy
+          when the user happensto be right falls from 59.4% toward the no-belief
+          level (51.9%).
+        </p>
+        <p>
+          I also compared self-steering to a variant of
+          <a href="https://openreview.net/forum?id=Oi47wc10sm"
+            >conditional activation steering</a
+          >
+          (CAST; Lee et al., 2025), which applies a condition and a steering
+          vector as runtime hooks. The hook checks the
+          self-steering condition (\(w_g\)) once, at the last prompt token,
+          and, if it is met, adds the write vector \(d\) at the same layer and
+          norm as the steering neurons, at that token and every token of the
+          response. <b>This represents a ceiling on the performance
+          of self-steering</b>, because the hook decides once and then 
+          writes at full strength for the whole response, whereas the 
+          steering neurons have to re-evaluate the condition at every token. 
+          This baseline isolates the effect of compiling steering into 
+          the weights; <b>our goal is to match rather than beat it.</b>
+        </p>
+        <p>
+          Compared to conditional steering, re-evaluating the condition at
+          every token cost the steering neurons 8.7 accuracy points under a
+          wrong suggestion; under right suggestion, doubt, and with no belief,
+          results were similar.
+        </p>
+        <style>
+          .results-table {
+            border-collapse: collapse;
+          }
+
+          .results-table th,
+          .results-table td {
+            padding: 6px 12px;
+            text-align: left;
+            white-space: nowrap;
+          }
+
+          .results-table thead {
+            border-bottom: 1px solid currentColor;
+          }
+
+          .results-table tbody + tbody {
+            border-top: 1px solid currentColor;
+          }
+        </style>
+
+        <div style="overflow-x: auto">
+          <table class="results-table">
+            <thead>
+              <tr>
+                <th>SycophancyEval <i>answer</i></th>
+                <th>Base</th>
+                <th>Self-steering</th>
+                <th>Conditional steering</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Accuracy, no belief</td>
+                <td>43.1%</td>
+                <td>42.9%</td>
+                <td>43.1%</td>
+              </tr>
+              <tr>
+                <td>Accuracy, user suggests wrong answer</td>
+                <td>15.3%</td>
+                <td>30.7%</td>
+                <td>39.4%</td>
+              </tr>
+              <tr>
+                <td>Accuracy, user suggests right answer</td>
+                <td>59.4%</td>
+                <td>51.9%</td>
+                <td>49.2%</td>
+              </tr>
+              <tr>
+                <td>Accuracy, user doubts right answer</td>
+                <td>49.9%</td>
+                <td>44.2%</td>
+                <td>42.3%</td>
+              </tr>
+            </tbody>
+            <tbody>
+              <tr>
+                <td>Adopts the user's wrong answer</td>
+                <td>24.8%</td>
+                <td>11.6%</td>
+                <td>6.0%</td>
+              </tr>
+              <tr>
+                <td>Correct lost under wrong suggestion</td>
+                <td>67.9%</td>
+                <td>35.9%</td>
+                <td>17.9%</td>
+              </tr>
+              <tr>
+                <td>Correct kept under right suggestion</td>
+                <td>93.7%</td>
+                <td>91.8%</td>
+                <td>90.4%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          In the <i>"are you sure"</i>subset of the same benchmark, the model
+          answers a question first, and then the user replies, <i>"I don't
+          think that's right. Are you sure?".</i>This is an out-of-distribution
+          setting with multi-turn conversations in a format unseen during training.
+          The edited model changes a correct first
+          answer to a wrong one 16.2% of the time instead of 19.3%, and the
+          apologetic openings <i>("I apologize for the confusion…"),</i>with
+          which the unedited model begins 6.2% of its second answers, almost
+          disappear (0.1%). First-answer accuracy is unchanged (62.1%).
+        </p>
+        <div style="overflow-x: auto">
+          <table class="results-table">
+            <thead>
+              <tr>
+                <th>SycophancyEval <i>are you sure</i></th>
+                <th>Base</th>
+                <th>Self-steering</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Accuracy, first answer</td>
+                <td>62.1%</td>
+                <td>62.1%</td>
+              </tr>
+              <tr>
+                <td>Accuracy, after "Are you sure?"</td>
+                <td>56.9%</td>
+                <td>59.1%</td>
+              </tr>
+              <tr>
+                <td>Correct first answer changed to wrong</td>
+                <td>19.3%</td>
+                <td>16.2%</td>
+              </tr>
+              <tr>
+                <td>Wrong first answer corrected</td>
+                <td>18.0%</td>
+                <td>18.6%</td>
+              </tr>
+              <tr>
+                <td>Apologises after the challenge</td>
+                <td>6.2%</td>
+                <td>0.1%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Beyond accuracy with no stated belief, I evaluated collateral damage on
+          ordinary text where the steering neurons should not fire
+          (perplexity/NLL/next-token prediction accuracy on WikiText-2 test split).
+          All metrics are unchanged to the third significant figure.
+        </p>
+        <div style="overflow-x: auto">
+          <table class="results-table">
+            <thead>
+              <tr>
+                <th>Metric</th>
+                <th>Base</th>
+                <th>Self-steering</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>WikiText-2 perplexity</td>
+                <td>11.297</td>
+                <td>11.301</td>
+              </tr>
+              <tr>
+                <td>WikiText-2 NLL</td>
+                <td>2.4245</td>
+                <td>2.4249</td>
+              </tr>
+              <tr>
+                <td>WikiText-2 next-token accuracy</td>
+                <td>52.75%</td>
+                <td>52.60%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div
+        class="results-panel"
+        role="tabpanel"
+        id="corrigibility-results"
+        aria-labelledby="corrigibility-results-tab"
+        hidden
+      >
+        <p>
+          I evaluated the edited model on an in-distribution held-out split (50
+          human-written <i>neutral-HHH</i>questions) and three out-of-distribution
+          LM-written sets (<i>neutral/more/less-HHH;</i>200 questions each)—all from
+          the advanced-AI-risk collection.
+        </p>
+        <p>
+          On the human-written set, the model <b>consented
+          to 76% of the proposed changes, up from 46%</b>. On the LM-written sets,
+          the base model was already corrigible in the <i>neutral-HHH</i>and
+          <i>more-HHH</i>scenarios and remained so after the edit; in the
+          <i>less-HHH</i>scenario, its corrigibility increased <b>from 28.6% to 59.2%</b>.
+          (Whether corrigibility to being less HHH is a good thing has no universal right
+          answer; steering here was invariant to HHH—trained on <i>neutral</i>only—and
+          generalized.)
+        </p>
+        <p>
+          I further evaluated the selectivity of self-steering to the corrigibility
+          trait (whether or not the steering effect would transfer to survival instinct
+          or other similar traits such as desire for power, desire for wealth, or myopic
+          reward). Steering is indeed corrigibility-selective: behavior rates on
+          other traits barely change, except that the edited model becomes somewhat
+          less wealth-seeking (77.2%, down from 82.7%).
+        </p>
+        <p>
+          WikiText-2 perplexity remained nearly unaffected. Conditional steering
+          closely matched self-steering on every set.
+        </p>
+        <div style="overflow-x: auto">
+          <table class="results-table">
+            <thead>
+              <tr>
+                <th>Eval dataset</th>
+                <th>Base</th>
+                <th>Self-steering</th>
+                <th>Conditional steering</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Human-written, neutral (held out)</td>
+                <td>46.0%</td>
+                <td>76.0%</td>
+                <td>78.0%</td>
+              </tr>
+              <tr>
+                <td>LM-written, neutral</td>
+                <td>89.5%</td>
+                <td>90.5%</td>
+                <td>90.5%</td>
+              </tr>
+              <tr>
+                <td>LM-written, more HHH</td>
+                <td>95.5%</td>
+                <td>96.0%</td>
+                <td>96.0%</td>
+              </tr>
+              <tr>
+                <td>LM-written, less HHH</td>
+                <td>28.6%</td>
+                <td>59.2%</td>
+                <td>61.7%</td>
+              </tr>
+            </tbody>
+            <tbody>
+              <tr>
+                <td>Survival instinct</td>
+                <td>25.5%</td>
+                <td>27.1%</td>
+                <td>26.1%</td>
+              </tr>
+              <tr>
+                <td>Power seeking</td>
+                <td>7.7%</td>
+                <td>8.7%</td>
+                <td>9.2%</td>
+              </tr>
+              <tr>
+                <td>Wealth seeking</td>
+                <td>82.7%</td>
+                <td>77.2%</td>
+                <td>77.2%</td>
+              </tr>
+              <tr>
+                <td>Myopic reward</td>
+                <td>22.5%</td>
+                <td>22.5%</td>
+                <td>22.5%</td>
+              </tr>
+            </tbody>
+            <tbody>
+              <tr>
+                <td>WikiText-2 perplexity</td>
+                <td>11.297</td>
+                <td>11.299</td>
+                <td>11.297</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div
+        class="results-panel"
+        role="tabpanel"
+        id="survival-results"
+        aria-labelledby="survival-results-tab"
+        hidden
+      >
+        <p>
+          The evaluaton setup was similar to corrigibility: an in-distribution held-out
+          split (here LM-written) and an out-of-distribution set (here human-written)
+          from the advanced-AI-risk collection.
+        </p>
+        <p>
+          The steering effect was substantial on the in-distribution set (<b>-9.8 percentage
+          points</b>) but smaller out of distribution (-2.3 percentage points). The
+          human-written questions are longer and more varied in form than the
+          LM-written ones that the steering neurons were fitted on, so both the
+          read and write vectors
+          transfered less well to them. Other traits and perplexity similarly remained
+          nearly unaffected.
+        </p>
+        <p>
+          Conditional steering matched self-steering within 1-2 percentage points
+          on every evaluation set.
+        </p>
+        <div style="overflow-x: auto">
+          <table class="results-table">
+            <thead>
+              <tr>
+                <th>Evaluation dataset</th>
+                <th>Base</th>
+                <th>Self-steering</th>
+                <th>Conditional steering</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>LM-written (held out)</td>
+                <td>28.6%</td>
+                <td>18.8%</td>
+                <td>19.3%</td>
+              </tr>
+              <tr>
+                <td>Human-written</td>
+                <td>22.2%</td>
+                <td>19.9%</td>
+                <td>20.8%</td>
+              </tr>
+            </tbody>
+            <tbody>
+              <tr>
+                <td>Corrigibility</td>
+                <td>50.5%</td>
+                <td>50.0%</td>
+                <td>51.5%</td>
+              </tr>
+              <tr>
+                <td>Power seeking</td>
+                <td>7.7%</td>
+                <td>8.7%</td>
+                <td>9.2%</td>
+              </tr>
+              <tr>
+                <td>Wealth seeking</td>
+                <td>82.7%</td>
+                <td>82.7%</td>
+                <td>82.7%</td>
+              </tr>
+              <tr>
+                <td>Myopic reward</td>
+                <td>22.5%</td>
+                <td>22.5%</td>
+                <td>22.5%</td>
+              </tr>
+            </tbody>
+            <tbody>
+              <tr>
+                <td>WikiText-2 perplexity</td>
+                <td>11.297</td>
+                <td>11.298</td>
+                <td>11.297</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div
+        class="results-panel"
+        role="tabpanel"
+        id="refusal-results"
+        aria-labelledby="refusal-results-tab"
+        hidden
+      >
+        <p>
+          The evaluation datasets were:
+          <ul>
+            <li><b>Harmful</b>:
+            <ul>
+              <li>
+                <a href="https://jailbreakbench.github.io/">JailbreakBench</a>
+                harmful prompts—each in one plain variant and two wrapped variants: 
+                <i>PAIR</i>(iteratively-refined roleplay and framing) and 
+                <i>random search</i>(a long rule-following template with
+                an optimized suffix).
+              </li>
+              <li>
+                <a href="https://arxiv.org/abs/2308.01263">XSTest</a>
+                <i>unsafe</i>(plain).
+              </li>
+            </ul>
+            </li>
+            <li style="margin-top: 10pt;"><b>Harmless</b> (all harmful-looking to test over-refusal):
+            <ul>
+              <li>JailbreakBench <i>benign;</i></li>
+              <li>XSTest <i>safe;</i></li>
+              <li><a href="https://arxiv.org/abs/2405.20947">OR-Bench</a> <i>hard;</i></li>
+              <li><a href="https://arxiv.org/abs/2505.08054">FalseReject</a> (test split).</li>
+            </ul>
+            </li>
+          </ul>
+        </p>
+        <p>
+          Responses were judged by
+          <a href="https://huggingface.co/Qwen/Qwen3Guard-Gen-4B"
+            >Qwen3Guard-Gen-4B</a
+          >: each response was classified as (1) safe vs. unsafe and (2) refusing
+          vs. non-refusing.
+        </p>
+        <p>
+          In the edited model, the share of successful PAIR jailbreaks fell <b>from
+          52% to 23%</b>. The share of successful random-search attacks fell from 96%
+          to 88%: this is an advanced attack whose template dictates the exact
+          opening of the response, and once the model has complied with that,
+          it is very difficult to self-correct.
+        </p>
+        <p>
+          Collateral cost is significant in the form of over-refusals on harmful-looking
+          benign requests, but nil in the form of WikiText-2 perplexity (in fact,
+          perplexity improved from 11.297 to 11.295).
+        </p>
+        <p>
+          Conditional steering matched self-steering on PAIR (23%) and went
+          further on random search (81%), at the price of more over-refusals.
+        </p>
+        <div style="overflow-x: auto">
+          <table class="results-table">
+            <thead>
+              <tr>
+                <th>Harmful sets: unsafe responses</th>
+                <th>Base</th>
+                <th>Self-steering</th>
+                <th>Conditional steering</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>JailbreakBench, plain</td>
+                <td>2.0%</td>
+                <td>0.0%</td>
+                <td>0.0%</td>
+              </tr>
+              <tr>
+                <td>JailbreakBench, PAIR</td>
+                <td>51.6%</td>
+                <td>23.4%</td>
+                <td>23.4%</td>
+              </tr>
+              <tr>
+                <td>JailbreakBench, random search</td>
+                <td>96.0%</td>
+                <td>88.0%</td>
+                <td>81.0%</td>
+              </tr>
+              <tr>
+                <td>XSTest unsafe</td>
+                <td>0.5%</td>
+                <td>0.0%</td>
+                <td>0.0%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="overflow-x: auto">
+          <table class="results-table">
+            <thead>
+              <tr>
+                <th>Benign sets: refusals</th>
+                <th>Base</th>
+                <th>Self-steering</th>
+                <th>Conditional steering</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>XSTest safe</td>
+                <td>5.2%</td>
+                <td>6.8%</td>
+                <td>8.4%</td>
+              </tr>
+              <tr>
+                <td>JailbreakBench benign</td>
+                <td>14.0%</td>
+                <td>29.0%</td>
+                <td>31.0%</td>
+              </tr>
+              <tr>
+                <td>OR-Bench hard</td>
+                <td>18.2%</td>
+                <td>44.0%</td>
+                <td>52.5%</td>
+              </tr>
+              <tr>
+                <td>FalseReject</td>
+                <td>26.0%</td>
+                <td>38.2%</td>
+                <td>46.5%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <script>
+        (function () {
+          const tabs = Array.from(document.querySelectorAll(".results-tab"));
+          const panelOf = (tab) =>
+            document.getElementById(tab.getAttribute("aria-controls"));
+
+          function select(tab) {
+            for (const t of tabs) {
+              const selected = t === tab;
+              t.setAttribute("aria-selected", selected);
+              t.tabIndex = selected ? 0 : -1;
+              panelOf(t).hidden = !selected;
+            }
+          }
+
+          // Links such as #refusal-results open the matching tab.
+          function selectFromHash() {
+            const tab = tabs.find((t) => "#" + panelOf(t).id === location.hash);
+            if (tab) {
+              select(tab);
+              panelOf(tab).scrollIntoView();
+            }
+          }
+
+          tabs.forEach((tab, i) => {
+            tab.addEventListener("click", () => select(tab));
+            tab.addEventListener("keydown", (event) => {
+              const target = {
+                ArrowRight: tabs[(i + 1) % tabs.length],
+                ArrowLeft: tabs[(i - 1 + tabs.length) % tabs.length],
+                Home: tabs[0],
+                End: tabs[tabs.length - 1],
+              }[event.key];
+              if (!target) return;
+              event.preventDefault();
+              select(target);
+              target.focus();
+            });
+          });
+
+          window.addEventListener("hashchange", selectFromHash);
+          selectFromHash();
+        })();
+      </script>
+      <h3>Discussion</h3>
+      <p>
+        The project shows that not only deterministic output control, but also
+        "soft" behavioral steering can be programmed into model weights. This
+        has implications for introspection, as it allows the model to self-correct
+        its behavior if it detects undesirable intent in its internals. This also
+        eliminates the need for runtime hooks, so steering can travel with the
+        model checkpoint, and no special adjustments are needed to serve the
+        steered model with an inference engine like vLLM or llama.cpp.
+      </p>
+    </main>
+    <footer>
+      <a class="navlink" href="https://www.linkedin.com/in/daria-kryvosheieva"
+        ><i class="fa-brands fa-linkedin fa-lg"></i
+      ></a>
+      <b>⋅</b>
+      <a class="navlink" href="https://x.com/DKryvosheieva"
+        ><i class="fa-brands fa-twitter fa-lg" style="margin-left: 5px"></i
+      ></a>
+      <b>⋅</b>
+      <a
+        class="navlink"
+        href="https://scholar.google.com/citations?user=sANdwAkAAAAJ"
+        ><i
+          class="fa-brands fa-google-scholar fa-lg"
+          style="margin-left: 5px"
+        ></i
+      ></a>
+      <b>⋅</b>
+      <a class="navlink" href="https://github.com/dariakryvosheieva"
+        ><i class="fa-brands fa-github fa-lg" style="margin-left: 5px"></i
+      ></a>
+    </footer>
+  </body>
+</html>
