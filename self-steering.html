@@ -419,7 +419,7 @@
           the model answers correctly on its own, it loses 67.9% under a wrong
           suggestion without the edit and <b>only 35.9%</b> with it. No-belief
           accuracy is virtually unchanged (42.9%), and, as intended, accuracy
-          when the user happensto be right falls from 59.4% toward the no-belief
+          when the user happens to be right falls from 59.4% toward the no-belief
           level (51.9%).
         </p>
         <p>
@@ -984,12 +984,18 @@
       <h3>Discussion</h3>
       <p>
         The project shows that not only deterministic output control, but also
-        "soft" behavioral steering can be programmed into model weights. This
-        has implications for introspection, as it allows the model to self-correct
-        its behavior if it detects undesirable intent in its internals. This also
-        eliminates the need for runtime hooks, so steering can travel with the
-        model checkpoint, and no special adjustments are needed to serve the
-        steered model with an inference engine like vLLM or llama.cpp.
+        "soft" behavioral steering can be programmed into model weights.
+      </p>
+      <p>
+        This has implications for introspection, as it allows the model to
+        self-correct its behavior if it detects undesirable intent in its internals.
+        In a multi-turn conversation or trajectory, steering would automatically
+        fire only for as long as necessary to correct the behavior, then switch off.
+      </p>
+      <p>
+        This also eliminates the need for runtime hooks, so steering can travel with
+        the model checkpoint, and no special adjustments are needed to serve the
+        steered model on HuggingFace or with an inference engine like vLLM or llama.cpp.
       </p>
       <section id="comments">
         <script
